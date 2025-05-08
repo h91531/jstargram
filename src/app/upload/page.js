@@ -8,6 +8,7 @@ export default function UploadPage() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
+  const [uploadedUrls, setUploadedUrls] = useState([])  // 업로드된 URL들을 상태로 관리
 
   // 파일이 이미 존재하는지 확인하는 함수
   const checkIfFileExists = async (fileName) => {
@@ -72,8 +73,46 @@ export default function UploadPage() {
       alert('업로드 성공!')
       setTitle('')
       setContent('')
-      setFiles([])
-      window.location.href="/";
+      setFiles([])  // 파일 리스트 초기화
+      setUploadedUrls(uploadedUrls)  // 업로드된 이미지 URL 상태 업데이트
+      window.location.href="/";  // 업로드 후 페이지 리로드
+    }
+
+    setLoading(false)
+  }
+
+  // 이미지 삭제 함수
+  const handleDelete = async (fileUrl) => {
+    setLoading(true)
+
+    const fileName = fileUrl.split('/storage/v1/object/public/')[1]  // 파일명 추출
+    console.log('삭제할 파일 이름:', fileName);  // 파일 이름 콘솔에 출력
+
+    const { error: deleteError } = await supabase.storage
+      .from('img') // 'img' 버킷에서 삭제
+      .remove([fileName])  // 파일명 배열로 전달
+
+    if (deleteError) {
+      console.error('이미지 삭제 실패:', deleteError.message)
+      alert('이미지 삭제 실패')
+      setLoading(false)
+      return
+    }
+
+    // DB에서 해당 이미지 URL 삭제 (삭제된 URL만 필터링)
+    const { error: updateError } = await supabase
+      .from('diary')
+      .update({
+        image_url: uploadedUrls.filter(url => url !== fileUrl)  // 삭제된 URL 제외
+      })
+      .eq('image_url', fileUrl)
+
+    if (updateError) {
+      console.error('DB 업데이트 실패:', updateError.message)
+      alert('DB에서 이미지 URL 삭제 실패')
+    } else {
+      alert('이미지 삭제 성공!')
+      setUploadedUrls(uploadedUrls.filter(url => url !== fileUrl))  // 상태에서 삭제된 URL 제거
     }
 
     setLoading(false)
@@ -105,6 +144,21 @@ export default function UploadPage() {
       <button onClick={handleUpload} disabled={loading} className="upload_btn">
         {loading ? '업로드 중...' : '업로드'}
       </button>
+
+      {/* 업로드된 이미지와 삭제 버튼 */}
+      {uploadedUrls.length > 0 && (
+        <div style={{ marginTop: '20px' }}>
+          <h3>업로드된 이미지</h3>
+          {uploadedUrls.map((url, index) => (
+            <div key={index} style={{ marginBottom: '10px' }}>
+              <img src={url} alt={`업로드된 이미지 ${index + 1}`} style={{ width: '100px', marginRight: '10px' }} />
+              <button onClick={() => handleDelete(url)} disabled={loading}>
+                {loading ? '삭제 중...' : '삭제'}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

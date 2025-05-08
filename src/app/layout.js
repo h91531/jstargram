@@ -1,10 +1,7 @@
 import './globals.css'
 import Link from "next/link";
 
-export const metadata = {
-  title: '기본 SNS',
-  description: 'Next.js + Supabase SNS 앱',
-}
+
 
 export default function RootLayout({ children }) {
   return (

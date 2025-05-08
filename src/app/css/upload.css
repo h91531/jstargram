@@ -1,0 +1,133 @@
+/* 전체 컨테이너 스타일 */
+.upload_container {
+    width: 90%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff8f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 제목 입력 */
+  .upload_container input[type="text"],
+  .upload_container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #f3a6c6;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+  }
+  
+  /* 제목 입력 포커스 효과 */
+  .upload_container input[type="text"]:focus,
+  .upload_container textarea:focus {
+    border-color: #ff6699;
+  }
+  
+  /* 내용 입력 */
+  .upload_container textarea {
+    min-height: 150px;
+    resize: none;
+    font-size: 16px;
+    padding: 10px;
+    border: 1px solid #f3a6c6;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+  }
+  
+  /* 파일 입력 */
+  .upload_container input[type="file"] {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  /* 버튼 */
+  .upload_btn {
+    background-color: #ff6699;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+  
+  .upload_btn:disabled {
+    background-color: #f3a6c6;
+  }
+  
+  .upload_btn:hover:not(:disabled) {
+    background-color: #ff3385;
+  }
+  
+  /* 업로드된 이미지 섹션 */
+  .upload_container h3 {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .upload_container img {
+    max-width: 100px;
+    height: auto;
+    margin-right: 10px;
+    border-radius: 8px;
+  }
+  
+  /* 이미지 삭제 버튼 */
+  .upload_container button {
+    background-color: #ff6699;
+    color: white;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+  
+  .upload_container button:disabled {
+    background-color: #f3a6c6;
+  }
+  
+  .upload_container button:hover:not(:disabled) {
+    background-color: #ff3385;
+  }
+  
+  /* 모바일 반응형 */
+  @media (max-width: 600px) {
+    .upload_container {
+      padding: 15px;
+    }
+  
+    .upload_container input[type="text"],
+    .upload_container textarea,
+    .upload_btn {
+      font-size: 14px;
+    }
+  
+    .upload_container h3 {
+      font-size: 16px;
+    }
+  
+    .upload_container img {
+      width: 80px;
+      height: 80px;
+    }
+  
+    .upload_container button {
+      font-size: 14px;
+      padding: 8px 15px;
+    }
+  }
+  

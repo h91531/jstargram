@@ -1,0 +1,136 @@
+.edit-container {
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff8f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .edit-container .edit-input,
+  .edit-container .edit-textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #f3a6c6;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+  }
+  
+  .edit-container .edit-input:focus,
+  .edit-container .edit-textarea:focus {
+    border-color: #ff6699;
+  }
+  
+  .edit-container .edit-textarea {
+    min-height: 150px;
+    resize: none;
+    height: 150px; 
+    font-size: 16px;
+    padding: 10px;
+    border: 1px solid #f3a6c6;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+  }
+  
+  
+  .edit-container .existing-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .edit-container .existing-images .img_wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+  }
+  
+  .edit-container .existing-images img {
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .edit-container .delete_btn {
+    background-color: #ff6699;
+    color: white;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+  
+  .edit-container .delete_btn:hover {
+    background-color: #ff3385;
+  }
+  
+  .edit-container .update_btn {
+    background-color: #ff6699;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+  
+  .edit-container .update_btn:disabled {
+    background-color: #f3a6c6;
+  }
+  
+  .edit-container .update_btn:hover:not(:disabled) {
+    background-color: #ff3385;
+  }
+  
+  .edit-container .add_img {
+    margin: 15px 0;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .edit-container .add_img_input {
+    margin-bottom: 0;
+  }
+  
+  @media (max-width: 600px) {
+    .edit-container {
+      padding: 15px;
+    }
+  
+    .edit-container .edit-input,
+    .edit-container .edit-textarea {
+      font-size: 14px;
+    }
+  
+    .edit-container .existing-images {
+      justify-content: center;
+    }
+  
+    .edit-container .existing-images img {
+      width: 80px;
+      height: 80px;
+    }
+  
+    .edit-container .delete_btn,
+    .edit-container .update_btn {
+      font-size: 14px;
+      padding: 8px 15px;
+    }
+  }
+  

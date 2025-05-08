@@ -4,6 +4,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import '../app/css/post.css'
 
 export default function PostCard({ post }) {
   const router = useRouter();
@@ -21,7 +22,6 @@ export default function PostCard({ post }) {
     }
   }
 
-  console.log("이미지 URL들:", imageUrls);
 
   // 날짜 포맷
   const formatDate = (dateString) => {
@@ -40,53 +40,41 @@ export default function PostCard({ post }) {
     if (!isConfirmed) return;
 
     try {
-      // 🔽 이미지 경로 파싱
+      // 🔽 이미지 경로 파싱: /img/ 이후의 경로만 추출
       const imagePaths = imageUrls
         .map((url) => {
-          try {
-            const path = url.split("/storage/v1/object/public/")[1];
-            if (!path) throw new Error("유효하지 않은 URL 경로");
-
-            // img 버킷이라면, 앞에 'img/' 붙여줘야 Supabase에서 인식함
-            const fullPath = `img/${path}`;
-            console.log("삭제 대상 전체 경로:", fullPath);
-            return fullPath;
-          } catch (e) {
-            console.error("경로 파싱 실패:", url, e);
-            return null;
-          }
+          const match = url.match(/\/img\/(.+)$/); // img/ 뒤 경로 추출
+          return match ? match[1] : null;
         })
-        .filter(Boolean)
-        .map((path) => path.replace(/^img\//, "")); // supabase.storage.from("img") 사용 시 img/ 제거
+        .filter(Boolean);
 
-      console.log("삭제할 이미지 경로들:", imagePaths);
 
+      // 🔽 이미지 먼저 삭제
       if (imagePaths.length > 0) {
         const { error: storageError } = await supabase.storage
           .from("img")
           .remove(imagePaths);
 
         if (storageError) {
-          console.error("이미지 삭제 실패:", storageError);
           alert("이미지 삭제 실패: " + storageError.message);
-          return;
-        } else {
-          console.log("이미지 삭제 성공");
+          return; // ❌ 이미지 삭제 실패 시, 중단
         }
+
       }
 
-      const { error } = await supabase.from("diary").delete().eq("id", post.id);
+      // 🔽 DB 레코드 삭제
+      const { error } = await supabase
+        .from("diary")
+        .delete()
+        .eq("id", post.id);
 
       if (error) {
-        console.error("글 삭제 실패:", error);
         alert("글 삭제 실패: " + error.message);
       } else {
-        console.log("글 삭제 성공:", post.id);
         alert("글과 이미지가 삭제되었습니다.");
         window.location.reload();
       }
     } catch (error) {
-      console.error("삭제 중 오류 발생:", error);
       alert("삭제 중 오류가 발생했습니다.");
     }
   };

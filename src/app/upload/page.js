@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
+import '../css/upload.css'
 
 export default function UploadPage() {
   const [files, setFiles] = useState([])  // 파일 배열로 상태 변경
@@ -70,7 +71,7 @@ export default function UploadPage() {
       console.error('DB 저장 실패:', insertError.message)
       alert('데이터 저장 실패')
     } else {
-      alert('업로드 성공!')
+      alert('업로드가 완료되었습니다.')
       setTitle('')
       setContent('')
       setFiles([])  // 파일 리스트 초기화
@@ -111,7 +112,7 @@ export default function UploadPage() {
       console.error('DB 업데이트 실패:', updateError.message)
       alert('DB에서 이미지 URL 삭제 실패')
     } else {
-      alert('이미지 삭제 성공!')
+      alert('이미지 삭제가 완료되었습니다.')
       setUploadedUrls(uploadedUrls.filter(url => url !== fileUrl))  // 상태에서 삭제된 URL 제거
     }
 
@@ -119,7 +120,7 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="container" style={{ maxWidth: '600px', margin: '0 auto' }}>
+    <div className="upload_container" style={{ maxWidth: '600px', margin: '0 auto' }}>
       <h1>📝 게시물 업로드</h1>
       <input
         type="text"

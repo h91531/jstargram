@@ -1,0 +1,41 @@
+/* styles/card.css */
+
+.card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  
+  .card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+  }
+  
+  .card h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  
+  .card p {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #666;
+    word-break: break-word;
+    margin-bottom: 15px;
+  }
+  
+  .card span {
+    font-size: 14px;
+    color: #999;
+  }
+  

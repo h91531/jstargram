@@ -73,6 +73,7 @@ export default function UploadPage() {
       setTitle('')
       setContent('')
       setFiles([])
+      window.location.href="/";
     }
 
     setLoading(false)
@@ -101,7 +102,7 @@ export default function UploadPage() {
         multiple  // 여러 파일 업로드 가능
         style={{ marginBottom: '10px' }}
       />
-      <button onClick={handleUpload} disabled={loading}>
+      <button onClick={handleUpload} disabled={loading} className="upload_btn">
         {loading ? '업로드 중...' : '업로드'}
       </button>
     </div>

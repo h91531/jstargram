@@ -1,12 +1,33 @@
+"use client";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import React, { useRef, useEffect, useState } from "react";
 import '../app/css/post.css'
 
+
+
 export default function PostCard({ post }) {
+  const contentRef = useRef(null);
+  const [isEllipsed, setIsEllipsed] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (el) {
+      setIsEllipsed(el.scrollHeight > el.clientHeight + 1);
+    }
+  }, []);
+
+  const handleContentClick = () => {
+    if (isEllipsed) {
+      setIsExpanded(true);
+    }
+  };
+
   const router = useRouter();
   let imageUrls = [];
 
@@ -103,15 +124,48 @@ export default function PostCard({ post }) {
           ))}
         </Swiper>
       )}
-      <h2>{post?.title}</h2>
-      <p>{post?.content}</p>
-      <span>{formatDate(post?.created_at)}</span>
-      <button onClick={handleDelete} className="delete_btn">
-        글 삭제
-      </button>
-      <button onClick={handleEdit} className="modify_btn">
-        글 수정
-      </button>
+      <div className="content_wrap">
+        <div className="txt_wrap">
+          <i><img src="/comment.svg"></img>0</i>
+          <h2>{post?.title}</h2>
+          <p
+            ref={contentRef}
+            onClick={handleContentClick}
+            className={`truncated ${isEllipsed && !isExpanded ? "ellipsed" : ""}`}
+            style={isExpanded ? { display: "block", cursor: "auto" } : {}}
+          >
+            {post?.content}
+          </p>
+          
+          <span>{formatDate(post?.created_at)}</span>
+        </div>
+        <div className="btn_wrap">
+          <button onClick={handleDelete} className="delete_btn">
+            글 삭제
+          </button>
+          <button onClick={handleEdit} className="modify_btn">
+            글 수정
+          </button>
+        </div>
+      </div>
+      <div className="comment_wrap">
+        <div className="title_wrap">
+          <h2>댓글</h2>
+        </div>
+        <div className="comment">
+  {Array.isArray(post.comments) && post.comments.length > 0 ? (
+    post.comments.slice().reverse().map((comment, idx) => (
+      <div key={idx} className="comment_txt">
+        <i>{formatDate(comment.created_at)}</i>
+        <span>{comment.text}</span>
+      </div>
+    ))
+  ) : (
+    <p>댓글이 없습니다.</p> // 댓글이 없을 때 보여줄 내용
+  )}
+</div>
+
+      </div>
     </div>
   );
 }

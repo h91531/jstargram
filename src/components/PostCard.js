@@ -8,30 +8,43 @@ import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import "../app/css/post.css";
 import useCommentStore from "../store/commentStore";
+import { format } from "date-fns";
 
 const parseImageUrls = (imageUrl) => {
-  if (!imageUrl) return []; // imageUrl이 null, undefined, 빈 값이면 빈 배열 반환
-  if (Array.isArray(imageUrl)) return imageUrl; // 이미지 URL이 이미 배열인 경우 그대로 반환
+  if (!imageUrl) return []; 
+  if (Array.isArray(imageUrl)) return imageUrl; 
   if (typeof imageUrl === "string") {
     try {
-      const parsed = JSON.parse(imageUrl); // JSON 형식으로 문자열을 배열로 파싱
-      return Array.isArray(parsed) ? parsed : [imageUrl]; // 배열로 변환, 비정상적일 경우 자체 배열로 감싸기
+      const parsed = JSON.parse(imageUrl); 
+      return Array.isArray(parsed) ? parsed : [imageUrl]; 
     } catch (e) {
-      return imageUrl.split(",").map((url) => url.trim()); // JSON 파싱 실패 시 쉼표로 구분된 문자열을 배열로 분리
+      return imageUrl.split(",").map((url) => url.trim()); 
     }
   }
-  return []; // imageUrl이 배열도 아니고 문자열도 아닌 경우 빈 배열 반환
+  return []; 
 };
 
+// 클라이언트 측에서 날짜 포맷을 설정하는 함수
 const formatDate = (dateString) => {
+  const timeZone = "Asia/Seoul"; 
+
+  if (!dateString) return "날짜 오류";
+
   const date = new Date(dateString);
   if (isNaN(date)) return "날짜 오류";
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const dd = String(date.getDate()).padStart(2, "0");
-  const hh = String(date.getHours()).padStart(2, "0");
-  const mi = String(date.getMinutes()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+
+  // Intl.DateTimeFormat을 사용하여 서울 타임존으로 날짜 포맷
+  const formattedDate = new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZone: timeZone,
+  }).format(date);
+
+  return formattedDate;
 };
 
 export default function PostCard({ post }) {

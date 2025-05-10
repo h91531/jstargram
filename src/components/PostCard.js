@@ -194,7 +194,7 @@ export default function PostCard({ post }) {
 
   useEffect(() => {
     setTimestamp(Date.now());
-  }, []);
+  }, []); // 빈 배열을 사용하여 컴포넌트가 마운트된 후에만 실행
 
   return (
     <div className="card">

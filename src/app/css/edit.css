@@ -1,11 +1,17 @@
 .edit-container {
-    width: 90%;
-    max-width: 800px;
+    max-width: 600px;
     margin: 0 auto;
     padding: 20px;
     background-color: #fff8f9;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .edit-container h1 {
+    text-align: center;
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: 20px;
   }
   
   .edit-container .edit-input,
@@ -81,7 +87,7 @@
   .edit-container .update_btn {
     background-color: #ff6699;
     color: white;
-    padding: 10px 20px;
+    padding: 12px;
     border: none;
     border-radius: 8px;
     cursor: pointer;

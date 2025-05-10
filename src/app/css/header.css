@@ -1,0 +1,6 @@
+header {position: fixed; width: 100%; top: 0; left: 0; padding: 20px 0; background: #ff6699; z-index: 2;}
+header .container {}
+header .container ul {display: flex; justify-content: center; gap: 30px; font-size: 20px; font-weight: 700; color: #fff;}
+header .container ul li {}
+header .container ul li a {}
+header b {color: red;}

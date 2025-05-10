@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabaseClient'
 import '../css/upload.css'
 
 export default function UploadPage() {
+  
   const [files, setFiles] = useState([])  // 파일 배열로 상태 변경
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
@@ -117,11 +118,12 @@ export default function UploadPage() {
     }
 
     setLoading(false)
+
   }
 
   return (
     <div className="upload_container" style={{ maxWidth: '600px', margin: '0 auto' }}>
-      <h1>📝 게시물 업로드</h1>
+      <h1>게시물 업로드</h1>
       <input
         type="text"
         placeholder="제목을 입력하세요"
@@ -163,3 +165,8 @@ export default function UploadPage() {
     </div>
   )
 }
+
+
+
+
+

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState, useMemo } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
+import dynamic from "next/dynamic"; // dynamic import를 사용
 import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -10,6 +10,10 @@ import { useRouter } from "next/navigation";
 import "../app/css/post.css";
 import useCommentStore from "../store/commentStore";
 import { v4 as uuidv4 } from "uuid";
+
+// Swiper와 SwiperSlide를 dynamic import로 클라이언트 전용으로 불러옵니다.
+const Swiper = dynamic(() => import("swiper/react").then(mod => mod.Swiper), { ssr: false });
+const SwiperSlide = dynamic(() => import("swiper/react").then(mod => mod.SwiperSlide), { ssr: false });
 
 const parseImageUrls = (imageUrl) => {
   if (Array.isArray(imageUrl)) return imageUrl;
@@ -142,7 +146,7 @@ export default function PostCard({ post }) {
     }
 
     const newComment = {
-      id: uuidv4(), 
+      id: uuidv4(),
       text: commentText,
       created_at: new Date().toISOString(),
     };
@@ -189,6 +193,16 @@ export default function PostCard({ post }) {
       alert("댓글 삭제 중 오류가 발생했습니다.");
     }
   };
+
+  // 클라이언트 전용 렌더링 코드
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null; // 서버에서 렌더링하지 않도록
+  }
 
   return (
     <div className="card">

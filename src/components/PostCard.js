@@ -8,6 +8,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import "../app/css/post.css";
 import useCommentStore from "../store/commentStore";
+import { v4 as uuidv4 } from "uuid"; // ✅ 추가
 
 const parseImageUrls = (imageUrl) => {
   if (Array.isArray(imageUrl)) return imageUrl;
@@ -42,7 +43,6 @@ export default function PostCard({ post }) {
   const isCommentOpen = commentStates[post.id];
   const imageUrls = useMemo(() => parseImageUrls(post?.image_url), [post?.image_url]);
 
-  // ✅ 수정된 부분: 문자열로 들어오는 댓글 파싱 처리
   const [comments, setComments] = useState(() => {
     const raw = post.comments;
     if (Array.isArray(raw)) return raw;
@@ -141,7 +141,7 @@ export default function PostCard({ post }) {
     }
 
     const newComment = {
-      id: String(Date.now()), // 이 부분이 Hydration 오류를 일으킬 수 있음
+      id: uuidv4(), // ✅ 변경된 부분
       text: commentText,
       created_at: new Date().toISOString(),
     };
@@ -188,13 +188,6 @@ export default function PostCard({ post }) {
       alert("댓글 삭제 중 오류가 발생했습니다.");
     }
   };
-
-  // 클라이언트에서만 Date.now() 실행되도록 수정
-  const [timestamp, setTimestamp] = useState(null);
-
-  useEffect(() => {
-    setTimestamp(Date.now());
-  }, []); // 빈 배열을 사용하여 컴포넌트가 마운트된 후에만 실행
 
   return (
     <div className="card">

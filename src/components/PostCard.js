@@ -42,7 +42,7 @@ export default function PostCard({ post }) {
   const isCommentOpen = commentStates[post.id];
   const imageUrls = useMemo(() => parseImageUrls(post?.image_url), [post?.image_url]);
 
-  // ✅ 수정된 부분: 문자열로 들어오는 댓글 파싱 처리
+  // 댓글 상태 수정
   const [comments, setComments] = useState(() => {
     const raw = post.comments;
     if (Array.isArray(raw)) return raw;
@@ -195,7 +195,7 @@ export default function PostCard({ post }) {
         {imageUrls.length > 0 && (
           <Swiper modules={[Pagination]} spaceBetween={10} slidesPerView={1} pagination={{ clickable: true }}>
             {imageUrls.map((url, index) => (
-              <SwiperSlide key={index}>
+              <SwiperSlide key={url}>
                 <img src={url.trim()} alt={`게시물 이미지 ${index + 1}`} style={{ width: "100%", height: "auto" }} />
               </SwiperSlide>
             ))}

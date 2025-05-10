@@ -10,13 +10,13 @@ import "../app/css/post.css";
 import useCommentStore from "../store/commentStore";
 
 const parseImageUrls = (imageUrl) => {
-  if (Array.isArray(imageUrl)) return imageUrl;
+  if (Array.isArray(imageUrl)) return imageUrl; // 이미지 URL이 이미 배열인 경우 그대로 반환
   if (typeof imageUrl === "string") {
     try {
-      const parsed = JSON.parse(imageUrl);
-      return Array.isArray(parsed) ? parsed : imageUrl.split(",");
+      const parsed = JSON.parse(imageUrl); // JSON 형식으로 문자열을 배열로 파싱
+      return Array.isArray(parsed) ? parsed : imageUrl.split(","); // 배열로 변환
     } catch (e) {
-      return imageUrl.split(",");
+      return imageUrl.split(","); // JSON 파싱 실패 시 쉼표로 구분된 문자열을 배열로 분리
     }
   }
   return [];

@@ -1,7 +1,6 @@
 "use client";
-
 import React, { useRef, useEffect, useState, useMemo } from "react";
-import dynamic from "next/dynamic"; // dynamic import를 사용
+import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -9,11 +8,6 @@ import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import "../app/css/post.css";
 import useCommentStore from "../store/commentStore";
-import { v4 as uuidv4 } from "uuid";
-
-// Swiper와 SwiperSlide를 dynamic import로 클라이언트 전용으로 불러옵니다.
-const Swiper = dynamic(() => import("swiper/react").then(mod => mod.Swiper), { ssr: false });
-const SwiperSlide = dynamic(() => import("swiper/react").then(mod => mod.SwiperSlide), { ssr: false });
 
 const parseImageUrls = (imageUrl) => {
   if (Array.isArray(imageUrl)) return imageUrl;
@@ -44,24 +38,14 @@ export default function PostCard({ post }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { commentEnter, setCommentEnter } = useCommentStore();
   const router = useRouter();
+
   const { commentStates, toggleComment, closeComment } = useCommentStore();
   const isCommentOpen = commentStates[post.id];
+
   const imageUrls = useMemo(() => parseImageUrls(post?.image_url), [post?.image_url]);
 
-  const [comments, setComments] = useState(() => {
-    const raw = post.comments;
-    if (Array.isArray(raw)) return raw;
-    if (typeof raw === "string") {
-      try {
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        console.error("❌ 댓글 JSON 파싱 실패:", raw);
-        return [];
-      }
-    }
-    return [];
-  });
+  // ✅ 댓글 상태 관리
+  const [comments, setComments] = useState(Array.isArray(post.comments) ? post.comments : []);
 
   useEffect(() => {
     const el = contentRef.current;
@@ -121,6 +105,7 @@ export default function PostCard({ post }) {
     setCommentEnter(post.id, "");
   };
 
+  // ✅ 댓글 갱신 함수
   const fetchUpdatedComments = async () => {
     const { data, error } = await supabase
       .from("diary")
@@ -129,15 +114,11 @@ export default function PostCard({ post }) {
       .single();
 
     if (!error && data?.comments) {
-      try {
-        const parsed = typeof data.comments === "string" ? JSON.parse(data.comments) : data.comments;
-        setComments(parsed);
-      } catch {
-        console.error("댓글 다시 불러오기 실패");
-      }
+      setComments(data.comments);
     }
   };
 
+  // ✅ 댓글 등록 함수
   const handleCommentSubmit = async () => {
     const commentText = commentEnter[post.id];
     if (!commentText.trim()) {
@@ -146,13 +127,14 @@ export default function PostCard({ post }) {
     }
 
     const newComment = {
-      id: uuidv4(),
+      id: String(Date.now()),
       text: commentText,
       created_at: new Date().toISOString(),
     };
 
     try {
       const updatedComments = [...comments, newComment];
+
       const { error } = await supabase
         .from("diary")
         .update({ comments: updatedComments })
@@ -163,7 +145,7 @@ export default function PostCard({ post }) {
       } else {
         alert("댓글이 등록되었습니다!");
         setCommentEnter(post.id, "");
-        await fetchUpdatedComments();
+        await fetchUpdatedComments(); // ✅ 최신 댓글 다시 불러옴
       }
     } catch (error) {
       console.error("댓글 등록 오류:", error);
@@ -172,19 +154,24 @@ export default function PostCard({ post }) {
   };
 
   const handleCommentDelete = async (commentId) => {
+    // 삭제 전에 사용자에게 확인 요청
     const isConfirmed = window.confirm("정말 이 댓글을 삭제하시겠습니까?");
     if (!isConfirmed) return;
-
+  
     try {
+      // 해당 댓글 삭제 (필요한 댓글 ID로 Supabase에서 삭제)
       const updatedComments = comments.filter(comment => comment.id !== commentId);
+  
+      // Supabase에 업데이트된 댓글 배열을 다시 저장
       const { error } = await supabase
         .from("diary")
         .update({ comments: updatedComments })
         .eq("id", post.id);
-
+  
       if (error) {
         alert("댓글 삭제 실패: " + error.message);
       } else {
+        // UI에서 삭제된 댓글 반영
         setComments(updatedComments);
         alert("댓글이 삭제되었습니다.");
       }
@@ -193,16 +180,6 @@ export default function PostCard({ post }) {
       alert("댓글 삭제 중 오류가 발생했습니다.");
     }
   };
-
-  // 클라이언트 전용 렌더링 코드
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    return null; // 서버에서 렌더링하지 않도록
-  }
 
   return (
     <div className="card">
@@ -251,7 +228,7 @@ export default function PostCard({ post }) {
                 comments.slice().reverse().map((comment, idx) => (
                   <div key={idx} className="comment_txt">
                     <i>{formatDate(comment.created_at)}</i>
-                    <span>{typeof comment.text === "string" ? comment.text : comment.text?.content}</span>
+                    <span>{comment.text}</span>
                     <img
                       src="/close.svg"
                       alt="삭제"

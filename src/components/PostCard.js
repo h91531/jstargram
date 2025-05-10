@@ -236,7 +236,6 @@ export default function PostCard({ post }) {
                 comments.slice().reverse().map((comment, idx) => (
                   <div key={idx} className="comment_txt">
                     <i>{formatDate(comment.created_at)}</i>
-                    <span>{typeof comment.text === "string" ? comment.text : comment.text?.content}</span>
                     <img
                       src="/close.svg"
                       alt="삭제"

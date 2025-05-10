@@ -42,7 +42,7 @@ export default function PostCard({ post }) {
   const isCommentOpen = commentStates[post.id];
   const imageUrls = useMemo(() => parseImageUrls(post?.image_url), [post?.image_url]);
 
-  // 댓글 상태 수정
+  // ✅ 수정된 부분: 문자열로 들어오는 댓글 파싱 처리
   const [comments, setComments] = useState(() => {
     const raw = post.comments;
     if (Array.isArray(raw)) return raw;
@@ -141,7 +141,7 @@ export default function PostCard({ post }) {
     }
 
     const newComment = {
-      id: String(Date.now()),
+      id: String(Date.now()), // 이 부분이 Hydration 오류를 일으킬 수 있음
       text: commentText,
       created_at: new Date().toISOString(),
     };
@@ -189,13 +189,20 @@ export default function PostCard({ post }) {
     }
   };
 
+  // 클라이언트에서만 Date.now() 실행되도록 수정
+  const [timestamp, setTimestamp] = useState(null);
+
+  useEffect(() => {
+    setTimestamp(Date.now());
+  }, []);
+
   return (
     <div className="card">
       <div className="container">
         {imageUrls.length > 0 && (
           <Swiper modules={[Pagination]} spaceBetween={10} slidesPerView={1} pagination={{ clickable: true }}>
             {imageUrls.map((url, index) => (
-              <SwiperSlide key={url}>
+              <SwiperSlide key={index}>
                 <img src={url.trim()} alt={`게시물 이미지 ${index + 1}`} style={{ width: "100%", height: "auto" }} />
               </SwiperSlide>
             ))}

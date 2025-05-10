@@ -43,17 +43,25 @@ export default function PostCard({ post }) {
   const { commentStates, toggleComment, closeComment } = useCommentStore();
   const isCommentOpen = commentStates[post.id];
 
-  const imageUrls = useMemo(() => parseImageUrls(post?.image_url), [post?.image_url]);
-
   const [comments, setComments] = useState([]);
 
+  // 디버깅용 전체 post 로그
   useEffect(() => {
+    console.log("🪵 전체 post 객체:", post);
+    console.log("🧪 post.id:", post?.id, typeof post?.id);
+    console.log("🧪 post.title:", post?.title, typeof post?.title);
+    console.log("🧪 post.content:", post?.content, typeof post?.content);
+    console.log("🧪 post.image_url:", post?.image_url, typeof post?.image_url);
+    console.log("🧪 post.created_at:", post?.created_at, typeof post?.created_at);
+
     const el = contentRef.current;
     if (el) {
       setIsEllipsed(el.scrollHeight > el.clientHeight + 1);
     }
     fetchComments();
   }, []);
+
+  const imageUrls = useMemo(() => parseImageUrls(post?.image_url), [post?.image_url]);
 
   const handleContentClick = () => {
     if (isEllipsed) {
@@ -185,14 +193,14 @@ export default function PostCard({ post }) {
             <i className="comment_icon" onClick={handleCommentClick}>
               <img src="/comment.svg" alt="댓글 아이콘" /> {comments.length}
             </i>
-            <h2>{String(post?.title || "제목 없음")}</h2>
+            <h2>{typeof post?.title === "string" ? post.title : String(post?.title || "제목 없음")}</h2>
             <p
               ref={contentRef}
               onClick={handleContentClick}
               className={`truncated ${isEllipsed && !isExpanded ? "ellipsed" : ""}`}
               style={isExpanded ? { display: "block", cursor: "auto" } : {}}
             >
-              {String(post?.content || "")}
+              {typeof post?.content === "string" ? post.content : String(post?.content || "")}
             </p>
             <span>{formatDate(post?.created_at)}</span>
           </div>
@@ -214,7 +222,7 @@ export default function PostCard({ post }) {
                 comments.map((comment) => (
                   <div key={comment.id} className="comment_txt">
                     <i>{formatDate(comment.created_at)}</i>
-                    <span>{String(comment.text || "")}</span>
+                    <span>{typeof comment.text === "string" ? comment.text : String(comment.text || "")}</span>
                     <img
                       src="/close.svg"
                       alt="삭제"

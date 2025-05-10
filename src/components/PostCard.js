@@ -24,6 +24,7 @@ const parseImageUrls = (imageUrl) => {
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
+  if (isNaN(date)) return "날짜 오류";
   const yyyy = date.getFullYear();
   const mm = String(date.getMonth() + 1).padStart(2, "0");
   const dd = String(date.getDate()).padStart(2, "0");
@@ -121,7 +122,7 @@ export default function PostCard({ post }) {
 
   const handleCommentSubmit = async () => {
     const commentText = commentEnter[post.id];
-    if (!commentText.trim()) {
+    if (!commentText?.trim()) {
       alert("댓글을 입력해주세요.");
       return;
     }
@@ -184,14 +185,14 @@ export default function PostCard({ post }) {
             <i className="comment_icon" onClick={handleCommentClick}>
               <img src="/comment.svg" alt="댓글 아이콘" /> {comments.length}
             </i>
-            <h2>{post?.title}</h2>
+            <h2>{String(post?.title || "제목 없음")}</h2>
             <p
               ref={contentRef}
               onClick={handleContentClick}
               className={`truncated ${isEllipsed && !isExpanded ? "ellipsed" : ""}`}
               style={isExpanded ? { display: "block", cursor: "auto" } : {}}
             >
-              {post?.content}
+              {String(post?.content || "")}
             </p>
             <span>{formatDate(post?.created_at)}</span>
           </div>
@@ -205,7 +206,7 @@ export default function PostCard({ post }) {
         <div className={`comment_wrap ${isCommentOpen ? 'on' : ''}`}>
           <div className="title_wrap">
             <h2>댓글</h2>
-            <img src="/close.svg" alt="닫기" onClick={handleCloseComment}></img>
+            <img src="/close.svg" alt="닫기" onClick={handleCloseComment} />
           </div>
           <div className="comment_hidden">
             <div className="comment">
@@ -213,7 +214,7 @@ export default function PostCard({ post }) {
                 comments.map((comment) => (
                   <div key={comment.id} className="comment_txt">
                     <i>{formatDate(comment.created_at)}</i>
-                    <span>{comment.text}</span>
+                    <span>{String(comment.text || "")}</span>
                     <img
                       src="/close.svg"
                       alt="삭제"

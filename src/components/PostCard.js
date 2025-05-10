@@ -19,7 +19,7 @@ const parseImageUrls = (imageUrl) => {
       return imageUrl.split(","); // JSON 파싱 실패 시 쉼표로 구분된 문자열을 배열로 분리
     }
   }
-  return [];
+  return []; // imageUrl이 배열도 아니고 문자열도 아닌 경우 빈 배열 반환
 };
 
 const formatDate = (dateString) => {
@@ -136,10 +136,10 @@ export default function PostCard({ post }) {
     }
 
     try {
-      const { error } = await supabase.from("comments").insert([
-        {
-          diary_id: post.id,
-          text: commentText,
+      const { error } = await supabase.from("comments").insert([ 
+        { 
+          diary_id: post.id, 
+          text: commentText 
         },
       ]);
 

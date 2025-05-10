@@ -14,9 +14,9 @@ const parseImageUrls = (imageUrl) => {
   if (typeof imageUrl === "string") {
     try {
       const parsed = JSON.parse(imageUrl); // JSON 형식으로 문자열을 배열로 파싱
-      return Array.isArray(parsed) ? parsed : imageUrl.split(","); // 배열로 변환
+      return Array.isArray(parsed) ? parsed : [imageUrl]; // 배열로 변환, 비정상적일 경우 자체 배열로 감싸기
     } catch (e) {
-      return imageUrl.split(","); // JSON 파싱 실패 시 쉼표로 구분된 문자열을 배열로 분리
+      return imageUrl.split(",").map((url) => url.trim()); // JSON 파싱 실패 시 쉼표로 구분된 문자열을 배열로 분리
     }
   }
   return []; // imageUrl이 배열도 아니고 문자열도 아닌 경우 빈 배열 반환
@@ -45,21 +45,15 @@ export default function PostCard({ post }) {
 
   const [comments, setComments] = useState([]);
 
-  // 디버깅용 전체 post 로그
   useEffect(() => {
-    console.log("🪵 전체 post 객체:", post);
-    console.log("🧪 post.id:", post?.id, typeof post?.id);
-    console.log("🧪 post.title:", post?.title, typeof post?.title);
-    console.log("🧪 post.content:", post?.content, typeof post?.content);
-    console.log("🧪 post.image_url:", post?.image_url, typeof post?.image_url);
-    console.log("🧪 post.created_at:", post?.created_at, typeof post?.created_at);
-
+    if (post?.id) {
+      fetchComments();
+    }
     const el = contentRef.current;
     if (el) {
       setIsEllipsed(el.scrollHeight > el.clientHeight + 1);
     }
-    fetchComments();
-  }, []);
+  }, [post?.id]);
 
   const imageUrls = useMemo(() => parseImageUrls(post?.image_url), [post?.image_url]);
 
@@ -193,14 +187,14 @@ export default function PostCard({ post }) {
             <i className="comment_icon" onClick={handleCommentClick}>
               <img src="/comment.svg" alt="댓글 아이콘" /> {comments.length}
             </i>
-            <h2>{typeof post?.title === "string" ? post.title : String(post?.title || "제목 없음")}</h2>
+            <h2>{post?.title || "제목 없음"}</h2>
             <p
               ref={contentRef}
               onClick={handleContentClick}
               className={`truncated ${isEllipsed && !isExpanded ? "ellipsed" : ""}`}
               style={isExpanded ? { display: "block", cursor: "auto" } : {}}
             >
-              {typeof post?.content === "string" ? post.content : String(post?.content || "")}
+              {post?.content || "내용 없음"}
             </p>
             <span>{formatDate(post?.created_at)}</span>
           </div>
@@ -222,12 +216,8 @@ export default function PostCard({ post }) {
                 comments.map((comment) => (
                   <div key={comment.id} className="comment_txt">
                     <i>{formatDate(comment.created_at)}</i>
-                    <span>{typeof comment.text === "string" ? comment.text : String(comment.text || "")}</span>
-                    <img
-                      src="/close.svg"
-                      alt="삭제"
-                      onClick={() => handleCommentDelete(comment.id)}
-                    />
+                    <span>{comment.text || "내용 없음"}</span>
+                    <img src="/close.svg" alt="삭제" onClick={() => handleCommentDelete(comment.id)} />
                   </div>
                 ))
               ) : (
@@ -239,7 +229,7 @@ export default function PostCard({ post }) {
             <input 
               type="text" 
               placeholder="댓글을 입력하세요." 
-              value={commentEnter[post.id] || ""}
+              value={commentEnter[post.id] || ""} 
               onChange={(e) => setCommentEnter(post.id, e.target.value)} 
             />
             <button className="comment_submit_btn" onClick={handleCommentSubmit}>등록</button>

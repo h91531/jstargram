@@ -10,6 +10,7 @@ import "../app/css/post.css";
 import useCommentStore from "../store/commentStore";
 
 const parseImageUrls = (imageUrl) => {
+  if (!imageUrl) return []; // imageUrl이 null, undefined, 빈 값이면 빈 배열 반환
   if (Array.isArray(imageUrl)) return imageUrl; // 이미지 URL이 이미 배열인 경우 그대로 반환
   if (typeof imageUrl === "string") {
     try {

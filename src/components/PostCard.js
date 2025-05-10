@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useRef, useEffect, useState, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
@@ -8,7 +9,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import "../app/css/post.css";
 import useCommentStore from "../store/commentStore";
-import { v4 as uuidv4 } from "uuid"; // ✅ 추가
+import { v4 as uuidv4 } from "uuid";
 
 const parseImageUrls = (imageUrl) => {
   if (Array.isArray(imageUrl)) return imageUrl;
@@ -141,7 +142,7 @@ export default function PostCard({ post }) {
     }
 
     const newComment = {
-      id: uuidv4(), // ✅ 변경된 부분
+      id: uuidv4(), 
       text: commentText,
       created_at: new Date().toISOString(),
     };

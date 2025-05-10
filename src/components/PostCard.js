@@ -44,14 +44,14 @@ export default function PostCard({ post }) {
 
   const imageUrls = useMemo(() => parseImageUrls(post?.image_url), [post?.image_url]);
 
-  // ✅ 댓글 상태 관리
-  const [comments, setComments] = useState(Array.isArray(post.comments) ? post.comments : []);
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     const el = contentRef.current;
     if (el) {
       setIsEllipsed(el.scrollHeight > el.clientHeight + 1);
     }
+    fetchComments();
   }, []);
 
   const handleContentClick = () => {
@@ -105,20 +105,20 @@ export default function PostCard({ post }) {
     setCommentEnter(post.id, "");
   };
 
-  // ✅ 댓글 갱신 함수
-  const fetchUpdatedComments = async () => {
+  const fetchComments = async () => {
     const { data, error } = await supabase
-      .from("diary")
-      .select("comments")
-      .eq("id", post.id)
-      .single();
+      .from("comments")
+      .select("*")
+      .eq("diary_id", post.id)
+      .order("created_at", { ascending: false });
 
-    if (!error && data?.comments) {
-      setComments(data.comments);
+    if (!error) {
+      setComments(data);
+    } else {
+      console.error("댓글 불러오기 실패:", error.message);
     }
   };
 
-  // ✅ 댓글 등록 함수
   const handleCommentSubmit = async () => {
     const commentText = commentEnter[post.id];
     if (!commentText.trim()) {
@@ -126,26 +126,20 @@ export default function PostCard({ post }) {
       return;
     }
 
-    const newComment = {
-      id: String(Date.now()),
-      text: commentText,
-      created_at: new Date().toISOString(),
-    };
-
     try {
-      const updatedComments = [...comments, newComment];
-
-      const { error } = await supabase
-        .from("diary")
-        .update({ comments: updatedComments })
-        .eq("id", post.id);
+      const { error } = await supabase.from("comments").insert([
+        {
+          diary_id: post.id,
+          text: commentText,
+        },
+      ]);
 
       if (error) {
-        alert("댓글 추가 실패: " + error.message);
+        alert("댓글 등록 실패: " + error.message);
       } else {
         alert("댓글이 등록되었습니다!");
         setCommentEnter(post.id, "");
-        await fetchUpdatedComments(); // ✅ 최신 댓글 다시 불러옴
+        fetchComments();
       }
     } catch (error) {
       console.error("댓글 등록 오류:", error);
@@ -154,26 +148,17 @@ export default function PostCard({ post }) {
   };
 
   const handleCommentDelete = async (commentId) => {
-    // 삭제 전에 사용자에게 확인 요청
     const isConfirmed = window.confirm("정말 이 댓글을 삭제하시겠습니까?");
     if (!isConfirmed) return;
-  
+
     try {
-      // 해당 댓글 삭제 (필요한 댓글 ID로 Supabase에서 삭제)
-      const updatedComments = comments.filter(comment => comment.id !== commentId);
-  
-      // Supabase에 업데이트된 댓글 배열을 다시 저장
-      const { error } = await supabase
-        .from("diary")
-        .update({ comments: updatedComments })
-        .eq("id", post.id);
-  
+      const { error } = await supabase.from("comments").delete().eq("id", commentId);
+
       if (error) {
         alert("댓글 삭제 실패: " + error.message);
       } else {
-        // UI에서 삭제된 댓글 반영
-        setComments(updatedComments);
         alert("댓글이 삭제되었습니다.");
+        fetchComments();
       }
     } catch (error) {
       console.error("댓글 삭제 오류:", error);
@@ -225,8 +210,8 @@ export default function PostCard({ post }) {
           <div className="comment_hidden">
             <div className="comment">
               {comments.length > 0 ? (
-                comments.slice().reverse().map((comment, idx) => (
-                  <div key={idx} className="comment_txt">
+                comments.map((comment) => (
+                  <div key={comment.id} className="comment_txt">
                     <i>{formatDate(comment.created_at)}</i>
                     <span>{comment.text}</span>
                     <img

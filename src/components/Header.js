@@ -21,9 +21,9 @@ export default function Header() {
         <header>
             <div className="container">
                 <ul>
-                    <li><Link href="/" className="upload_link">홈<b>♥</b></Link></li>
+                    <li><Link href="/" className="upload_link">Home<b></b></Link></li>
                     {!uploadPath && (
-                        <li><Link href="/upload" className="upload_link">글 쓰기<b>♥</b></Link></li>
+                        <li><Link href="/upload" className="upload_link">글 쓰기<b></b></Link></li>
                     )}
                     {!hideSearch && (
                         <li className="search_nav">

@@ -1,0 +1,153 @@
+/* signup.css */
+
+.sign_up {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+  font-family: 'Segoe UI', 'Pretendard', sans-serif;
+}
+
+.sign_up .signup-container {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  padding: 40px 30px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.sign_up .signup-container h1 {
+  text-align: center;
+  color: #333;
+  font-size: 26px;
+  margin-bottom: 30px;
+}
+
+.sign_up .signup-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sign_up .signup-container .id_check {
+  display: flex;
+  gap: 8px;
+}
+
+.sign_up .signup-container .id_check .id_check_input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #fafafa;
+  transition: border-color 0.3s;
+}
+
+.sign_up .signup-container .id_check .id_check_input:focus {
+  outline: none;
+  border-color: #999;
+}
+
+.sign_up .signup-container .id_check .login_btn {
+  padding: 10px 16px;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.sign_up .signup-container .id_check .login_btn:hover {
+  background-color: #333;
+}
+
+.sign_up .signup-container .signup-input {
+  padding: 12px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #fafafa;
+  transition: border-color 0.3s;
+}
+
+.sign_up .signup-container .signup-input:focus {
+  outline: none;
+  border-color: #999;
+}
+
+.sign_up .signup-container .signup-button {
+  background-color: #333;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.sign_up .signup-container .signup-button:hover {
+  background-color: #000;
+}
+
+.sign_up .signup-container .profile-upload {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  color: #555;
+}
+
+.sign_up .signup-container .profile-upload label {
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #333;
+}
+
+.sign_up .signup-container .profile-upload input[type="file"] {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #fafafa;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sign_up .signup-container .image-preview {
+  margin-top: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sign_up .signup-container .image-preview img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.sign_up .signup-container .remove-btn {
+  margin-top: 8px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: underline;
+}
+
+.sign_up .signup-container .remove-btn:hover {
+  color: #000;
+}

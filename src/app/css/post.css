@@ -5,6 +5,13 @@
   gap: 30px;
 }
 
+.post_wrap .no_search {
+  text-align: center;
+  font-weight: 600;
+  font-size: 25px;
+  padding: 30px 0;
+}
+
 .post_wrap div:last-child {
   margin-bottom: 30px;
 }
@@ -162,6 +169,7 @@
   .card .comment_wrap .comment .comment_txt span {
     word-break: break-all;
     padding-right: 80px;
+    line-height: 1.3;
   }
 
   .card .comment_wrap .comment .comment_txt i {
@@ -196,5 +204,13 @@
     position: absolute;
     top: 50%;
     right: 30px;
+  }
+
+  .card .swiper-pagination {
+    position: static;
+  }
+  .card .swiper-wrapper {
+    display: flex;
+    align-items: center;
   }
 

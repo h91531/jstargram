@@ -2,8 +2,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import PostCard from './PostCard';
+import { supabase } from '../../lib/supabaseClient';
+import PostCard from './postcard/PostCard';
 
 export default function PostList() {
   const [data, setData] = useState([]);

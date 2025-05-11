@@ -214,3 +214,17 @@
     align-items: center;
   }
 
+.post_wrap .top {
+  cursor: pointer;
+  position: fixed;
+  right: calc((100vw - 550px) / 2);
+  bottom: 40px;
+  z-index: 999;
+  cursor: pointer;
+}
+.post_wrap .top img{
+    width: 40px;
+    height: 40px;
+}
+
+

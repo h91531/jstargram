@@ -7,10 +7,11 @@ import Header from '../components/Header';
 import { cookies } from 'next/headers';
 
 export const metadata = {
-  title: 'test',
+  title: 'SNS',
   icons: {
     apple: '/apple-touch-icon.png',
   },
+  viewport: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
 };
 
 // ✅ JWT를 직접 파싱하는 함수 (외부 라이브러리 없이)

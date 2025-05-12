@@ -10,3 +10,8 @@ header .mob.on {display: block;}
 header .mob .mob_nav {max-width: 600px; margin: 0 auto;}
 header .mob .mob_nav li {padding: 20px 0; font-weight: 700; border-bottom: 1px solid #ddd;}
 header .mob .mob_nav li:last-child {border: 0;}
+
+@media (max-width:650px) {
+    header .container {margin: 0 20px;}
+    header .mob .mob_nav li {padding: 20px;}
+}

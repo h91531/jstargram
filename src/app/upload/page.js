@@ -3,15 +3,15 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import '../css/upload.css'
+import useSwitchStore from '../../store/switchStore'
 
 export default function UploadPage() {
-
+  const { useNewUrl } = useSwitchStore()
   const [files, setFiles] = useState([])  // 파일 배열로 상태 변경
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [uploadedUrls, setUploadedUrls] = useState([])  // 업로드된 URL들을 상태로 관리
-
   // 이미지 리사이즈 및 압축 함수 (JPEG, PNG 등을 JPEG로 변환하고 압축)
   const resizeAndCompressImage = (file, maxWidth = 1280, quality = 0.85) => {
     return new Promise((resolve, reject) => {
@@ -83,7 +83,10 @@ export default function UploadPage() {
         }
 
         // 업로드된 파일의 퍼블릭 URL 생성
-        const imageUrl = `https://purrosepipqhtcxxxdmj.supabase.co/storage/v1/object/public/img/${fileName}`
+        const imageUrl = `${useNewUrl === 1
+          ? "https://chggmmhloccondzfrtpz.supabase.co"
+          : "https://purrosepipqhtcxxxdmj.supabase.co"
+        }/storage/v1/object/public/img/${fileName}`
         uploadedUrls.push(imageUrl)
 
       } catch (error) {

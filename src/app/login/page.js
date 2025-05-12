@@ -1,12 +1,14 @@
-"use client"
+'use client'
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';  // useRouter 추가
 import '../css/login.css';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const router = useRouter();  // useRouter 훅을 사용
 
   async function login_check(e) {
     e.preventDefault();
@@ -23,9 +25,8 @@ export default function Login() {
       const data = await response.json();
 
       if (data.success) {
-        window.location.href = '/dashboard';
-      }
-       else {
+        router.push('/');  // window.location.href 대신 router.push 사용
+      } else {
         setError(data.message || '아이디 또는 비밀번호가 틀렸습니다.');
         setUsername('');
         setPassword('');

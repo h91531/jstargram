@@ -5,10 +5,10 @@ import Header from '../components/Header'
 
 
 export const metadata = {
-  title: '지스타그램',
+  title: 'test',
   icons: {
     apple: '/apple-touch-icon.png',
-    icon: '/favicon.png'
+    // icon: '/favicon.png'
   },
 }
 

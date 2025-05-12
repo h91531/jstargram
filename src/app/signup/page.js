@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import '../css/signup.css';
+import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {
   const [id, setId] = useState('');
@@ -13,6 +14,7 @@ export default function SignupPage() {
   
   const [isIdChecked, setIsIdChecked] = useState(false);
   const [isNicknameChecked, setIsNicknameChecked] = useState(false);
+  const router = useRouter();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -50,7 +52,6 @@ export default function SignupPage() {
 
       if (res.ok) {
         alert(data.message);
-        // 성공 시 입력값 초기화
         setId('');
         setPassword('');
         setName('');
@@ -59,6 +60,8 @@ export default function SignupPage() {
         setNickname('');
         setIsIdChecked(false);
         setIsNicknameChecked(false);
+        router.push('/login');
+        
       } else {
         alert(data.message);
       }
@@ -70,8 +73,8 @@ const checkAvailability = async (type) => {
   const value = type === 'id' ? id : nickname;
 
   // 아이디나 닉네임이 1글자 이상인지 체크
-  if (value.length <= 1) {
-    alert(`${type === 'id' ? '아이디' : '닉네임'}를 입력해주세요.`);
+  if (value.length <= 5) {
+    alert(`${type === 'id' ? '아이디를 5자 이상' : '닉네임을 5자 이상'} 입력해주세요.`);
     return;
   }
 
@@ -152,7 +155,7 @@ const checkAvailability = async (type) => {
           />
           <input
             className="signup-input"
-            type="text"
+            type="date"
             placeholder="생년월일"
             value={birth}
             onChange={(e) => setBirth(e.target.value)}

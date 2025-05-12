@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
 import '../../css/edit.css';
+import useSwitchStore from '../../../store/switchStore'
 
 export default function EditPostPage() {
+  const { useNewUrl } = useSwitchStore()
   const router = useRouter();
   const params = useParams();
   const id = params.id;
-
   const [post, setPost] = useState(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -136,7 +137,10 @@ export default function EditPostPage() {
           return;
         }
 
-        const imageUrl = `https://purrosepipqhtcxxxdmj.supabase.co/storage/v1/object/public/img/${fileName}`;
+        const imageUrl = `${useNewUrl === 1
+          ? "https://chggmmhloccondzfrtpz.supabase.co"
+          : "https://purrosepipqhtcxxxdmj.supabase.co"
+        }/storage/v1/object/public/img/${fileName}`;
         uploadedUrls.push(imageUrl);
       } catch (error) {
         alert("이미지 처리 중 오류 발생: " + error.message);

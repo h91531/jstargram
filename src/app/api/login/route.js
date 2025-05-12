@@ -9,10 +9,10 @@ export async function POST(req) {
   const { data, error } = await supabase
     .from('users')
     .select('*')
-    .eq('id', username)
+    .eq('user_id', username)
     .single();
 
-  if (error || !data || data.password !== password) {
+  if (error || !data || data.user_password !== password) {
     return new Response(
       JSON.stringify({ success: false, message: '아이디 또는 비밀번호가 틀렸습니다.' }),
       { status: 401 }
@@ -20,7 +20,7 @@ export async function POST(req) {
   }
 
   const token = jwt.sign(
-    { id: data.id, username: data.username },
+    { id: data.user_id, username: data.user_name },
     secretKey,
     { expiresIn: '7d' }
   );

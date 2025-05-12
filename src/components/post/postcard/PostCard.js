@@ -51,6 +51,7 @@ export default function PostCard({ post }) {
   return (
     <div className="card">
       <div className="container">
+        {post?.nickname && (<h2 className="post_nickname">{post?.nickname}님의 게시물</h2>)}
         <PostImageSlider imageUrls={imageUrls} />
         <div className="content_wrap">
           <PostContent

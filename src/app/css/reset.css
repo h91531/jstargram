@@ -87,6 +87,10 @@ body {
   z-index: 10;
 }
 
+.bg.on {
+  display: block;
+}
+
 .container {
   max-width: 600px;
   margin: 0 auto;

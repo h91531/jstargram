@@ -1,14 +1,15 @@
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+// app/api/logout/route.js
+import { NextResponse } from 'next/server';
 
-export async function POST(request) {
-  // 비동기 쿠키 삭제
-  const cookieStore = await cookies(); // cookies()는 비동기
-  cookieStore.delete('auth_token', { path: '/' }); // 'auth_token' 쿠키 삭제
+export async function GET() {
+  const response = NextResponse.json({ message: 'Logged out' });
 
-  // Referer 헤더에서 이전 페이지 URL 가져오기
-  const refererUrl = request.headers.get('Referer') || '/';  // Referer가 없으면 '/'로 기본 설정
+  // ✅ 정확한 쿠키 삭제 (path 옵션 중요)
+  response.cookies.set('auth_token', '', {
+    httpOnly: true,
+    path: '/',
+    maxAge: 0,
+  });
 
-  // 리다이렉트 응답 반환
-  return NextResponse.redirect(refererUrl);
+  return response;
 }

@@ -62,7 +62,7 @@ export default function PostList() {
   return (
     <div className="post_wrap">
       {filteredData.map(post => (
-        <PostCard key={post.id} post={post} />
+          <PostCard key={post.id} post={post} />
       ))}
 
       {showTopButton && (

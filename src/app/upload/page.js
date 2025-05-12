@@ -4,8 +4,10 @@ import { useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import '../css/upload.css'
 import useSwitchStore from '../../store/switchStore'
+import userStore from '../../store/userStore'
 
 export default function UploadPage() {
+  const { nickname } = userStore()
   const { useNewUrl } = useSwitchStore()
   const [files, setFiles] = useState([])  // 파일 배열로 상태 변경
   const [title, setTitle] = useState('')
@@ -100,7 +102,13 @@ export default function UploadPage() {
     // DB에 저장 (이미지 URL을 배열 형태로 저장)
     const { error: insertError } = await supabase
       .from('diary') // 📌 'diary' 테이블 존재 확인 필요
-      .insert([{ title, content, image_url: uploadedUrls, created_at: new Date() }])  // 'image_url'을 배열로 저장
+      .insert([{ 
+        title, 
+        content, 
+        image_url: uploadedUrls, 
+        nickname,  // nickname을 함께 저장
+        created_at: new Date() 
+      }])
 
     if (insertError) {
       console.error('DB 저장 실패:', insertError.message)

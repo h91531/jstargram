@@ -20,7 +20,7 @@ export async function POST(req) {
   }
 
   const token = jwt.sign(
-    { id: data.user_id, username: data.user_name },
+    { id: data.user_id, username: data.user_name, usernickname: data.user_nickname },
     secretKey,
     { expiresIn: '7d' }
   );

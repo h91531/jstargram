@@ -1,25 +1,49 @@
-import './globals.css'
-import './css/reset.css'
-import Bg from '../components/background'
-import Header from '../components/Header'
+// layout.js
+import './globals.css';
+import './css/reset.css';
+import Bg from '../components/background';
+import Header from '../components/Header';
 
+import { cookies } from 'next/headers';
 
 export const metadata = {
   title: 'test',
   icons: {
     apple: '/apple-touch-icon.png',
-    // icon: '/favicon.png'
   },
+};
+
+// ✅ JWT를 직접 파싱하는 함수 (외부 라이브러리 없이)
+function decodeJWT(token) {
+  try {
+    const payload = token.split('.')[1];
+    const decoded = JSON.parse(Buffer.from(payload, 'base64').toString('utf8'));
+    return decoded;
+  } catch (e) {
+    console.error('❌ JWT parsing failed:', e);
+    return null;
+  }
 }
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  let nickname = ''; // `nickname`으로 변경
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token')?.value;
+
+
+  if (token) {
+    const decoded = decodeJWT(token);
+    nickname = decoded?.usernickname || ''; // `username`을 `nickname`으로 전달
+  }
+
   return (
     <html lang="ko">
       <body>
         <Bg />
-        <Header />
+        <Header nickname={nickname} /> {/* nickname을 전달 */}
         <main>{children}</main>
       </body>
     </html>
-  )
+  );
 }

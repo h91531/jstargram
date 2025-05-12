@@ -25,7 +25,8 @@ export default function Login() {
       const data = await response.json();
 
       if (data.success) {
-        router.push('/');  // window.location.href 대신 router.push 사용
+        router.push('/');
+        router.refresh();
       } else {
         setError(data.message || '아이디 또는 비밀번호가 틀렸습니다.');
         setUsername('');

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 const useSwitchStore = create((set) => ({
-  useNewUrl: 0, // 0: 기존, 1: 새 URL
+  useNewUrl: 0, // 0: 기존, 1: 새 UR
   toggleUrl: () => set((state) => ({ useNewUrl: state.useNewUrl === 1 ? 0 : 1 })),
 }))
 

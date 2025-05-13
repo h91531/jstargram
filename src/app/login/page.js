@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';  // useRouter 추가
 import '../css/login.css';
 
+
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -25,8 +26,7 @@ export default function Login() {
       const data = await response.json();
 
       if (data.success) {
-        router.push('/');
-        router.refresh();
+        window.location.href="/";
       } else {
         setError(data.message || '아이디 또는 비밀번호가 틀렸습니다.');
         setUsername('');

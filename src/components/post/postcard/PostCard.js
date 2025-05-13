@@ -9,9 +9,12 @@ import PostContent from "./PostContent";
 import PostActions from "./PostActions";
 import PostComments from "./PostComments";
 import parseImageUrls from "../../../utils/parseImageUrls";
+import userStore from '../../../store/userStore';
+
 import '../../../app/css/post.css';
 
 export default function PostCard({ post }) {
+  const {userStore_id} = userStore();
   const contentRef = useRef(null);
   const [isEllipsed, setIsEllipsed] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -28,11 +31,13 @@ export default function PostCard({ post }) {
       fetchComments();
     }
 
+
     const el = contentRef.current;
     if (el) {
       setIsEllipsed(el.scrollHeight > el.clientHeight + 1);
     }
   }, [post?.id]);
+
 
   const fetchComments = async () => {
     const { data, error } = await supabase
@@ -47,6 +52,8 @@ export default function PostCard({ post }) {
       console.error("댓글 불러오기 실패:", error.message);
     }
   };
+  console.log(post.user_id);
+  console.log(userStore_id);
 
   return (
     <div className="card">
@@ -63,7 +70,9 @@ export default function PostCard({ post }) {
             setIsExpanded={setIsExpanded}
             onCommentClick={() => toggleComment(post.id)}
           />
+        {post.user_id != null && post.user_id === userStore_id && (
           <PostActions post={post} imageUrls={imageUrls} router={router} />
+        )}
         </div>
         <PostComments
           postId={post.id}

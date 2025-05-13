@@ -2,10 +2,12 @@ import { useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import useCommentStore from "../../../store/commentStore";
 import formatDate from "../../../utils/formatDate";
+import userStore from "../../../store/userStore";
 
 export default function PostComments({ postId, isOpen, comments, fetchComments }) {
   const { commentEnter, setCommentEnter, closeComment } = useCommentStore();
   const [loading, setLoading] = useState(false);
+  const { nickname, userStore_id } = userStore()
 
   const handleSubmit = async () => {
     const text = commentEnter[postId];
@@ -16,7 +18,7 @@ export default function PostComments({ postId, isOpen, comments, fetchComments }
 
     setLoading(true);
     const { error } = await supabase.from("comments").insert([
-      { diary_id: postId, text }
+      { diary_id: postId, text, nickname }
     ]);
     setLoading(false);
 
@@ -55,6 +57,7 @@ export default function PostComments({ postId, isOpen, comments, fetchComments }
             comments.map((comment) => (
               <div key={comment.id} className="comment_txt">
                 <i>{formatDate(comment.created_at)}</i>
+                {comment.nickname && (<h2>{comment?.nickname}님 댓글</h2>)}
                 <span>{comment.text || "내용 없음"}</span>
                 <img src="/close.svg" alt="삭제" onClick={() => handleDelete(comment.id)} />
               </div>
@@ -64,6 +67,7 @@ export default function PostComments({ postId, isOpen, comments, fetchComments }
           )}
         </div>
       </div>
+      {userStore_id && userStore_id != null ? (
       <div className="comment_input_wrap">
         <input
           type="text"
@@ -75,6 +79,10 @@ export default function PostComments({ postId, isOpen, comments, fetchComments }
           등록
         </button>
       </div>
+      ) :
+      (<div className="comment_input_wrap">
+        <p>로그인 후 이용하세요.</p>
+      </div>)}
     </div>
   );
 }

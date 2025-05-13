@@ -7,7 +7,7 @@ import useSwitchStore from '../../store/switchStore'
 import userStore from '../../store/userStore'
 
 export default function UploadPage() {
-  const { nickname } = userStore()
+  const { nickname, userStore_id } = userStore()
   const { useNewUrl } = useSwitchStore()
   const [files, setFiles] = useState([])  // 파일 배열로 상태 변경
   const [title, setTitle] = useState('')
@@ -107,6 +107,7 @@ export default function UploadPage() {
         content, 
         image_url: uploadedUrls, 
         nickname,  // nickname을 함께 저장
+        user_id : userStore_id,
         created_at: new Date() 
       }])
 

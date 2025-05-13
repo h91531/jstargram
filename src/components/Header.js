@@ -9,12 +9,12 @@ import userStore from '../store/userStore.js';
 import React, { useState, useEffect } from 'react'; 
 import '../app/css/header.css';
 
-export default function Header({ nickname }) {
+export default function Header({ nickname, id }) {
   const pathname = usePathname();
   const hideSearch = pathname.includes('upload') || pathname.includes('edit');
   const uploadPath = pathname.includes('upload');
   const router = useRouter();
-  const { setNickname } = userStore(); 
+  const { setNickname, setId, logout } = userStore(); 
   const { isMobileMenuOpen, toggleMobileMenu } = useStore();
   const setSearchQuery = useSearchStore((state) => state.setSearchQuery);
 
@@ -26,18 +26,20 @@ export default function Header({ nickname }) {
   const handleLogout = async () => {
     try {
       await fetch('/api/logout');
-      router.push('/login');
-      router.refresh();
+      logout();
+      window.location.href="/login";
     } catch (error) {
       console.error('로그아웃 실패:', error);
     }
   };
 
-    useEffect(() => {
-    if (nickname) {
-      setNickname(nickname); // nickname을 userStore에 저장
+  useEffect(() => {
+    if (nickname && id) {
+      setNickname(nickname);
+      setId(id);
     }
-  }, [setNickname]);
+  }, [nickname, id, setNickname, setId]);
+
 
   // ✅ 경로가 변경되면 모바일 메뉴 닫기
   useEffect(() => {
@@ -45,7 +47,6 @@ export default function Header({ nickname }) {
       toggleMobileMenu();
     }
   }, [pathname]);
-
 
   return (
     <header>

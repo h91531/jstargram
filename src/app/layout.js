@@ -28,6 +28,7 @@ function decodeJWT(token) {
 
 export default async function RootLayout({ children }) {
   let nickname = ''; // `nickname`으로 변경
+  let id = '';
 
   const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
@@ -35,14 +36,15 @@ export default async function RootLayout({ children }) {
 
   if (token) {
     const decoded = decodeJWT(token);
-    nickname = decoded?.usernickname || ''; // `username`을 `nickname`으로 전달
+    nickname = decoded?.usernickname || '';
+    id = decoded?.userid || '';
   }
-
+  
   return (
     <html lang="ko">
       <body>
         <Bg />
-        <Header nickname={nickname} /> {/* nickname을 전달 */}
+        <Header nickname={nickname} id ={id} />
         <main>{children}</main>
       </body>
     </html>

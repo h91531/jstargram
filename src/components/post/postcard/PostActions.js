@@ -31,7 +31,7 @@ export default function PostActions({ post, imageUrls, router }) {
   };
 
   const handleEdit = () => {
-    router.push(`/edit/${post.id}`);
+    router.push(`/edit/${post.id}?id=${post.user_id}`);
   };
 
   return (

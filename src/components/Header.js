@@ -40,7 +40,6 @@ export default function Header({ nickname, id }) {
     }
   }, [nickname, id, setNickname, setId]);
 
-
   // ✅ 경로가 변경되면 모바일 메뉴 닫기
   useEffect(() => {
     if (isMobileMenuOpen) {

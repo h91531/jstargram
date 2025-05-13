@@ -11,6 +11,7 @@ export default function PostActions({ post, router }) {
         // 각 publicid가 유효한지 확인 후 삭제
         for (const publicid of post.publicid) {
           if (!publicid) {
+            console.error("publicid가 없습니다: ", publicid);
             continue; // publicid가 없으면 건너뜁니다.
           }
 
@@ -19,6 +20,7 @@ export default function PostActions({ post, router }) {
             ? publicid
             : `diary_images/${publicid}`;
 
+          console.log("삭제할 publicid:", cleanedPublicId);
 
           const response = await fetch("/api/deleteImage", {
             method: "POST",
@@ -56,4 +58,40 @@ export default function PostActions({ post, router }) {
       <button onClick={handleEdit} className="modify_btn">글 수정</button>
     </div>
   );
+}
+
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET,
+});
+
+export async function POST(req) {
+  try {
+    const body = await req.json();
+    console.log("🔍 [요청 본문] 받은 요청 데이터:", body);
+
+    const { publicId } = body;
+    if (!publicId) {
+      console.error("⚠️ publicId가 없음");
+      return Response.json({ error: 'publicId is required' }, { status: 400 });
+    }
+
+    // Cloudinary 경로 중복을 피하기 위해 "diary_images/"가 중복되지 않도록 처리
+    const fullPublicId = publicId.startsWith("diary_images/")
+      ? publicId
+      : `diary_images/${publicId}`;
+
+    console.log(`📁 [삭제 시도] Cloudinary에 보낼 전체 public_id: "${fullPublicId}"`);
+
+    const result = await cloudinary.uploader.destroy(fullPublicId);
+    console.log("✅ [Cloudinary 응답] 삭제 결과:", result);
+
+    return Response.json(result);
+  } catch (error) {
+    console.error("❌ [에러 발생] 이미지 삭제 중 오류:", error);
+    return Response.json({ error: error.message }, { status: 500 });
+  }
 }

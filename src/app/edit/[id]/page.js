@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
 import '../../css/edit.css';
-import useSwitchStore from '../../../store/switchStore'
+import useSwitchStore from '../../../store/switchStore';
 
 export default function EditPostPage() {
-  const { useNewUrl } = useSwitchStore()
   const router = useRouter();
   const params = useParams();
   const id = params.id;
@@ -17,6 +16,9 @@ export default function EditPostPage() {
   const [files, setFiles] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const cloudinaryPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+  const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`;
 
   useEffect(() => {
     if (id) {
@@ -47,27 +49,50 @@ export default function EditPostPage() {
     }
   }, [id]);
 
-  const handleRemoveExistingImage = async (imageUrlToRemove) => {
-    const isConfirmed = window.confirm("이 이미지를 삭제하시겠습니까?");
-    if (!isConfirmed) return;
+  // 이미지 삭제 핸들러 (Cloudinary와 Supabase에서 삭제)
+  const handleRemoveExistingImage = async (urlToRemove) => {
+    const confirmDelete = confirm("이 이미지를 삭제하시겠습니까?");
+    if (!confirmDelete) return;
 
+    const publicId = urlToRemove.split('/').pop().split('.')[0];  // Cloudinary URL에서 public_id 추출
+ 
     try {
-      const path = imageUrlToRemove.split("/storage/v1/object/public/")[1];
-      const filePath = path.replace(/^img\//, "");
+ 
+        const response = await fetch('/api/deleteImage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ publicId }),
+        });
 
-      const { error: storageError } = await supabase.storage
-        .from("img")
-        .remove([filePath]);
-
-      if (storageError) {
-        alert("이미지 삭제 실패: " + storageError.message);
+      const result = await response.json();
+      if (result.error) {
+        console.error('이미지 삭제 실패:', result.error.message);
+        alert('이미지 삭제 실패');
         return;
       }
 
-      setExistingImages((prev) => prev.filter((url) => url !== imageUrlToRemove));
-      alert("이미지가 삭제되었습니다.");
-    } catch (e) {
-      alert("이미지 삭제 실패");
+      // Supabase에서 URL 제거
+      setExistingImages((prev) => prev.filter((url) => url !== urlToRemove));
+
+      // Supabase에서 해당 URL을 제외한 새로운 이미지 URL 배열로 업데이트
+      const updatedImageUrls = existingImages.filter((url) => url !== urlToRemove);
+
+      const { error: updateError } = await supabase
+        .from("diary")
+        .update({
+          image_url: updatedImageUrls,
+        })
+        .eq("id", id);
+
+      if (updateError) {
+        console.error("수정 실패:", updateError.message);
+        alert("이미지 삭제 후 DB 수정 실패");
+      } else {
+        alert("이미지가 삭제되었습니다.");
+      }
+    } catch (error) {
+      console.error("이미지 삭제 중 오류 발생:", error.message);
+      alert("이미지 삭제 중 오류 발생");
     }
   };
 
@@ -91,17 +116,13 @@ export default function EditPostPage() {
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        canvas.toBlob(
-          (blob) => {
-            if (!blob) return reject(new Error("이미지 변환 실패"));
-            const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpeg", {
-              type: "image/jpeg",
-            });
-            resolve(newFile);
-          },
-          "image/jpeg",
-          quality
-        );
+        canvas.toBlob((blob) => {
+          if (!blob) return reject(new Error("이미지 변환 실패"));
+          const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpeg", {
+            type: "image/jpeg",
+          });
+          resolve(newFile);
+        }, "image/jpeg", quality);
       };
 
       img.onerror = () => reject(new Error("이미지 로딩 실패"));
@@ -117,31 +138,28 @@ export default function EditPostPage() {
     setLoading(true);
     const uploadedUrls = [...existingImages];
 
-    for (let file of files) {
-      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-        alert("JPEG, PNG, WebP 파일만 업로드 가능합니다.");
-        continue;
-      }
-
+    for (const file of files) {
       try {
         const compressedFile = await resizeAndCompressImage(file);
-        const fileName = `${Date.now()}-${compressedFile.name}`;
 
-        const { error: uploadError } = await supabase.storage
-          .from("img")
-          .upload(fileName, compressedFile);
+        const formData = new FormData();
+        formData.append('file', compressedFile);
+        formData.append('upload_preset', cloudinaryPreset);
+        formData.append('folder', 'diary_images');
 
-        if (uploadError) {
-          alert("이미지 업로드 실패: " + uploadError.message);
+        const response = await fetch(cloudinaryUrl, {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+        if (result.error) {
+          alert("이미지 업로드 실패: " + result.error.message);
           setLoading(false);
           return;
         }
 
-        const imageUrl = `${useNewUrl === 1
-          ? "https://chggmmhloccondzfrtpz.supabase.co"
-          : "https://purrosepipqhtcxxxdmj.supabase.co"
-        }/storage/v1/object/public/img/${fileName}`;
-        uploadedUrls.push(imageUrl);
+        uploadedUrls.push(result.secure_url);
       } catch (error) {
         alert("이미지 처리 중 오류 발생: " + error.message);
         setLoading(false);

@@ -52,8 +52,7 @@ export default function PostCard({ post }) {
       console.error("댓글 불러오기 실패:", error.message);
     }
   };
-  console.log(post.user_id);
-  console.log(userStore_id);
+
 
   return (
     <div className="card">

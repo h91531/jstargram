@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '../../lib/supabaseClient'
-import '../css/upload.css'
 import useSwitchStore from '../../store/switchStore'
 import userStore from '../../store/userStore'
+import { supabase } from "../../lib/supabaseClient";
+import '../css/upload.css'
 
 export default function UploadPage() {
   const { nickname, userStore_id } = userStore()
@@ -14,6 +14,11 @@ export default function UploadPage() {
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [uploadedUrls, setUploadedUrls] = useState([])  // 업로드된 URL들을 상태로 관리
+
+  // Cloudinary 환경 변수 사용
+  const cloudinaryPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+  const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`;
+
   // 이미지 리사이즈 및 압축 함수 (JPEG, PNG 등을 JPEG로 변환하고 압축)
   const resizeAndCompressImage = (file, maxWidth = 1280, quality = 0.85) => {
     return new Promise((resolve, reject) => {
@@ -53,7 +58,7 @@ export default function UploadPage() {
     })
   }
 
-  // 파일 업로드 처리
+  // 파일 업로드 처리 (Cloudinary 사용)
   const handleUpload = async () => {
     if (files.length === 0 || !title || !content) {
       alert('파일, 제목, 내용 모두 입력해야 합니다.')
@@ -63,33 +68,38 @@ export default function UploadPage() {
     setLoading(true)
 
     const uploadedUrls = []  // 업로드된 이미지 URL들을 저장할 배열
+    const publicIds = []  // 업로드된 이미지의 publicId를 저장할 배열
 
     for (let file of files) {
       try {
         // 이미지 리사이즈 및 압축
         const compressedFile = await resizeAndCompressImage(file)
 
-        // 업로드할 파일명 생성
-        const fileName = `${Date.now()}-${compressedFile.name}`
+        // Cloudinary로 업로드
+        const formData = new FormData()
+        formData.append('file', compressedFile)  // 압축된 이미지
+        formData.append('upload_preset', cloudinaryPreset)  // Cloudinary upload preset
+        formData.append('folder', 'diary_images')  // 이미지가 저장될 폴더
 
-        // Supabase에 파일 업로드
-        const { error: uploadError } = await supabase.storage
-          .from('img')  // 📌 'img' 버킷이 존재해야 함
-          .upload(fileName, compressedFile)
+        const response = await fetch(cloudinaryUrl, {
+          method: 'POST',
+          body: formData
+        })
 
-        if (uploadError) {
-          console.error('업로드 실패:', uploadError.message)
+        const result = await response.json()
+
+        if (result.error) {
+          console.error('업로드 실패:', result.error.message)
           alert('이미지 업로드 실패')
           setLoading(false)
           return
         }
 
-        // 업로드된 파일의 퍼블릭 URL 생성
-        const imageUrl = `${useNewUrl === 1
-          ? "https://chggmmhloccondzfrtpz.supabase.co"
-          : "https://purrosepipqhtcxxxdmj.supabase.co"
-        }/storage/v1/object/public/img/${fileName}`
+        // 업로드된 이미지의 URL
+        const imageUrl = result.secure_url
+        const publicId = result.public_id  // publicId 반환받기
         uploadedUrls.push(imageUrl)
+        publicIds.push(publicId)  // publicId 저장
 
       } catch (error) {
         console.error('이미지 처리 중 오류 발생:', error.message)
@@ -99,15 +109,16 @@ export default function UploadPage() {
       }
     }
 
-    // DB에 저장 (이미지 URL을 배열 형태로 저장)
+    // DB에 저장 (이미지 URL과 publicId를 함께 저장)
     const { error: insertError } = await supabase
       .from('diary') // 📌 'diary' 테이블 존재 확인 필요
       .insert([{ 
         title, 
         content, 
-        image_url: uploadedUrls, 
+        image_url: uploadedUrls,  // 이미지 URL 저장
+        publicid: publicIds,  // publicId를 jsonb 형식으로 저장
         nickname,  // nickname을 함께 저장
-        user_id : userStore_id,
+        user_id: userStore_id,
         created_at: new Date() 
       }])
 

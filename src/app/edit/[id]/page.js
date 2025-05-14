@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
+import userStore from '../../../store/userStore'
 import '../../css/edit.css';
-import useSwitchStore from '../../../store/switchStore';
+import Cookies from 'js-cookie';
+import jwt from 'jsonwebtoken';
 
 export default function EditPostPage() {
   const router = useRouter();
@@ -15,17 +17,21 @@ export default function EditPostPage() {
   const [content, setContent] = useState("");
   const [files, setFiles] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
+  const {setId, userStore_id} = userStore();
 
   const cloudinaryPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
   const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`;
 
+
+
   useEffect(() => {
     if (id) {
       const fetchPost = async () => {
-        const { data, error } = await supabase.from("diary").select("*").eq("id", id).single();
+        const { data, error } = await supabase.from("diary").select("*").match({ "id": id, "user_id": userStore_id }).single();
         if (error) {
-          alert("글 불러오기 실패: " + error.message);
+          alert("잘못된 접근입니다.");
+          router.push("/");
         } else {
           setPost(data);
           setTitle(data.title);
@@ -185,6 +191,7 @@ export default function EditPostPage() {
 
     setLoading(false);
   };
+
 
   return (
     <div className="edit-container">

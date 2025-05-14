@@ -76,7 +76,7 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     transition: all 0.3s ease;
   }
   
@@ -106,7 +106,7 @@
   
   .edit-container .add_img {
     margin: 15px 0;
-    font-size: 14px;
+    font-size: 16px;
     color: #666;
   }
   
@@ -121,7 +121,7 @@
   
     .edit-container .edit-input,
     .edit-container .edit-textarea {
-      font-size: 14px;
+      font-size: 16px;
     }
   
     .edit-container .existing-images {
@@ -135,7 +135,7 @@
   
     .edit-container .delete_btn,
     .edit-container .update_btn {
-      font-size: 14px;
+      font-size: 16px;
       padding: 8px 15px;
     }
   }

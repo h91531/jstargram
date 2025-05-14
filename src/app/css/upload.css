@@ -100,7 +100,7 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     transition: all 0.3s ease;
   }
   
@@ -121,7 +121,7 @@
     .upload_container input[type="text"],
     .upload_container textarea,
     .upload_btn {
-      font-size: 14px;
+      font-size: 16px;
     }
   
     .upload_container h3 {
@@ -134,7 +134,7 @@
     }
   
     .upload_container button {
-      font-size: 14px;
+      font-size: 16px;
       padding: 8px 15px;
     }
   }

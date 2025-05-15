@@ -59,7 +59,8 @@ export default function PostComments({ postId, isOpen, comments, fetchComments }
                 <i>{formatDate(comment.created_at)}</i>
                 {comment.nickname && (<h2>{comment?.nickname}님 댓글</h2>)}
                 <span>{comment.text || "내용 없음"}</span>
-                <img src="/close.svg" alt="삭제" onClick={() => handleDelete(comment.id)} />
+                {nickname == comment.nickname &&  (<img src="/close.svg" alt="삭제" onClick={() => handleDelete(comment.id)} />)}
+
               </div>
             ))
           ) : (

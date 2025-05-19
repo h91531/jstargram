@@ -87,7 +87,7 @@
 
   .card .content_wrap .txt_wrap i {
     display: flex;
-    gap: 5px;
+    gap: 8px;
     align-items: center;
     cursor: pointer;
     margin-bottom: 30px;
@@ -228,6 +228,12 @@
 
 .post_wrap .post_nickname {
   padding: 15px;
+}
+
+.likes_wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 @media (max-width: 630px) {

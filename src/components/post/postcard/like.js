@@ -6,8 +6,9 @@ import { supabase } from "../../../lib/supabaseClient";
 export default function Like({ post_id }) {
   const { userStore_id } = useUserStore();
   const [isPushed, setIsPushed] = useState(false);
-  const [likeCount, setLikeCount] = useState(0); // 좋아요 개수 상태 추가
-  const [userList, setuserList] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [showUserListModal, setShowUserListModal] = useState(false);
+  const [likedUsers, setLikedUsers] = useState([]); // 좋아요 누른 사용자 ID 목록
 
   async function fetchLikeCount(postId) {
     const { data, error, count } = await supabase
@@ -19,8 +20,22 @@ export default function Like({ post_id }) {
       console.error("좋아요 개수 조회 실패:", error);
       return 0;
     }
-
     return count || 0;
+  }
+
+  // 좋아요 누른 사용자 ID 목록을 가져오는 함수
+  async function fetchLikedUsers(postId) {
+    const { data, error } = await supabase
+      .from("likes")
+      .select("user_id") // <--- likes 테이블의 user_id만 선택
+      .eq("post_id", postId);
+
+    if (error) {
+      console.error("좋아요 누른 유저 목록 조회 실패:", error);
+      return [];
+    }
+    // 가져온 데이터에서 user_id만 추출
+    return data.map(item => item.user_id);
   }
 
   useEffect(() => {
@@ -70,8 +85,19 @@ export default function Like({ post_id }) {
   };
 
   const show_user_list = async () => {
-    console.log(1);
-  }
+    if (likeCount === 0) {
+      alert("아직 좋아요를 누른 사람이 없습니다.");
+      return;
+    }
+    const users = await fetchLikedUsers(post_id);
+    setLikedUsers(users);
+    setShowUserListModal(true);
+  };
+
+  const closeUserListModal = () => {
+    setShowUserListModal(false);
+    setLikedUsers([]);
+  };
 
   return (
     <div className="likes_wrap">
@@ -81,7 +107,27 @@ export default function Like({ post_id }) {
         onClick={handleClick}
         style={{ cursor: "pointer" }}
       />
-      <strong className="user_list" onClick={show_user_list}>{likeCount}</strong>
+      <strong className="user_list" onClick={show_user_list} style={{ cursor: "pointer" }}>
+        {likeCount}
+      </strong>
+
+      {showUserListModal && (
+        <div className="modal_overlay">
+          <div className="modal_content">
+            <h3>좋아요 누른 사람들</h3>
+            <ul>
+              {likedUsers.length > 0 ? (
+                likedUsers.map((userId, index) => ( // 'username' 대신 'userId' 사용
+                  <li key={index}>{userId}</li>
+                ))
+              ) : (
+                <li>목록을 불러오는 중이거나, 좋아요를 누른 사람이 없습니다.</li>
+              )}
+            </ul>
+            <button onClick={closeUserListModal}>닫기</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -275,6 +275,16 @@
     background-color: #005bb5;
 }
 
+.post_wrap .profile_wrap {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    margin-left: 20px;
+}
+.post_wrap .profile_wrap img {
+    border-radius: 100%;
+}
+
 @media (max-width: 630px) {
     .post_wrap .top {
         right: 30px;

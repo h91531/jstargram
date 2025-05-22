@@ -8,15 +8,17 @@ import useStore from '../store/useStore';
 import userStore from '../store/userStore.js';
 import React, { useState, useEffect } from 'react'; 
 import '../app/css/header.css';
+import Image from 'next/image';
 
-export default function Header({ nickname, id }) {
+export default function Header({ nickname, id, profile }) {
   const pathname = usePathname();
   const hideSearch = pathname.includes('upload') || pathname.includes('edit');
   const uploadPath = pathname.includes('upload');
   const router = useRouter();
-  const { setNickname, setId, logout } = userStore(); 
+  const { setNickname, setId, logout, setProfile } = userStore(); 
   const { isMobileMenuOpen, toggleMobileMenu } = useStore();
   const setSearchQuery = useSearchStore((state) => state.setSearchQuery);
+  const displayProfile = profile || '/normal_profile.webp';
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
@@ -37,6 +39,8 @@ export default function Header({ nickname, id }) {
     if (nickname && id) {
       setNickname(nickname);
       setId(id);
+      setProfile(profile);
+
     }
   }, [nickname, id, setNickname, setId]);
 
@@ -46,13 +50,20 @@ export default function Header({ nickname, id }) {
       toggleMobileMenu();
     }
   }, [pathname]);
-
   return (
     <header>
       <div className="container">
         <h1><Link href="/">로고</Link></h1>
             {nickname && (
-               <h2 className="user_nickname">{nickname}님</h2>
+              <>
+                <h2 className="user_nickname">
+                <Image
+                  src={displayProfile}
+                  alt={`${nickname}님의 프로필 사진`} // 닉네임을 사용하여 더 의미 있는 alt 텍스트 제공
+                  width={30}
+                  height={30}
+                />{nickname}님</h2>
+               </>
             )}
         <ul className="nav">
           <li onClick={toggleMobileMenu}><img src="/menu.svg" alt="메뉴" /></li>

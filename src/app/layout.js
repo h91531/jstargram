@@ -30,6 +30,7 @@ function decodeJWT(token) {
 export default async function RootLayout({ children }) {
   let nickname = ''; // `nickname`으로 변경
   let id = '';
+  let profile = '';
 
   const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
@@ -39,13 +40,14 @@ export default async function RootLayout({ children }) {
     const decoded = decodeJWT(token);
     nickname = decoded?.usernickname || '';
     id = decoded?.userid || '';
+    profile = decoded?.userprofile || '';
   }
   
   return (
     <html lang="ko">
       <body>
         <Bg />
-        <Header nickname={nickname} id ={id} />
+        <Header nickname={nickname} id ={id} profile = {profile} />
         <main>{children}</main>
       </body>
     </html>

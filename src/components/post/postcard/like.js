@@ -8,12 +8,13 @@ export default function Like({ post_id }) {
   const [isPushed, setIsPushed] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [showUserListModal, setShowUserListModal] = useState(false);
-  const [likedUsers, setLikedUsers] = useState([]); // 좋아요 누른 사용자 ID 목록
+  const [likedUsers, setLikedUsers] = useState([]);
 
+  // 좋아요 개수 가져오기
   async function fetchLikeCount(postId) {
-    const { data, error, count } = await supabase
+    const { error, count } = await supabase
       .from("likes")
-      .select("*", { count: "exact" })
+      .select("id", { count: "exact" }) // * 대신 id만 선택
       .eq("post_id", postId);
 
     if (error) {
@@ -23,30 +24,31 @@ export default function Like({ post_id }) {
     return count || 0;
   }
 
-  // 좋아요 누른 사용자 ID 목록을 가져오는 함수
+  // 좋아요 누른 사용자 ID 목록 가져오기
   async function fetchLikedUsers(postId) {
     const { data, error } = await supabase
       .from("likes")
-      .select("user_id") // <--- likes 테이블의 user_id만 선택
+      .select("user_id") // 명시적으로 user_id만 선택
       .eq("post_id", postId);
 
     if (error) {
       console.error("좋아요 누른 유저 목록 조회 실패:", error);
       return [];
     }
-    // 가져온 데이터에서 user_id만 추출
+
     return data.map(item => item.user_id);
   }
 
   useEffect(() => {
     const fetchLikeStatus = async () => {
       if (!userStore_id) return;
-      const { data } = await supabase
+
+      const { data, error } = await supabase
         .from("likes")
-        .select("*")
+        .select("id") // 명시적으로 id만 선택
         .eq("user_id", userStore_id)
         .eq("post_id", post_id)
-        .single();
+        .maybeSingle(); // error 방지용
 
       if (data) setIsPushed(true);
     };
@@ -69,17 +71,19 @@ export default function Like({ post_id }) {
         .delete()
         .eq("user_id", userStore_id)
         .eq("post_id", post_id);
+
       if (!error) {
         setIsPushed(false);
-        setLikeCount((prevCount) => prevCount - 1);
+        setLikeCount(prev => prev - 1);
       }
     } else {
-      const { error } = await supabase.from("likes").insert([
-        { user_id: userStore_id, post_id: post_id },
-      ]);
+      const { error } = await supabase
+        .from("likes")
+        .insert([{ user_id: userStore_id, post_id }]);
+
       if (!error) {
         setIsPushed(true);
-        setLikeCount((prevCount) => prevCount + 1);
+        setLikeCount(prev => prev + 1);
       }
     }
   };
@@ -107,7 +111,11 @@ export default function Like({ post_id }) {
         onClick={handleClick}
         style={{ cursor: "pointer" }}
       />
-      <strong className="user_list" onClick={show_user_list} style={{ cursor: "pointer" }}>
+      <strong
+        className="user_list"
+        onClick={show_user_list}
+        style={{ cursor: "pointer" }}
+      >
         {likeCount}
       </strong>
 
@@ -117,7 +125,7 @@ export default function Like({ post_id }) {
             <h3>좋아요 누른 사람들</h3>
             <ul>
               {likedUsers.length > 0 ? (
-                likedUsers.map((userId, index) => ( // 'username' 대신 'userId' 사용
+                likedUsers.map((userId, index) => (
                   <li key={index}>{userId}</li>
                 ))
               ) : (

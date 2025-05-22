@@ -11,27 +11,26 @@ import PostComments from "./PostComments";
 import parseImageUrls from "../../../utils/parseImageUrls";
 import userStore from '../../../store/userStore';
 import '../../../app/css/post.css';
-import Image from 'next/image'; // Next.js의 Image 컴포넌트를 사용하기 위해 임포트합니다.
+import Image from 'next/image';
 
 export default function PostCard({ post }) {
   const { userStore_id } = userStore();
   const contentRef = useRef(null);
   const [isEllipsed, setIsEllipsed] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const { commentStates, toggleComment, closeComment } = useCommentStore();
+  const { commentStates, toggleComment } = useCommentStore();
   const isCommentOpen = commentStates[post.id];
   const router = useRouter();
 
-  // 사용자 프로필 이미지를 위한 상태와 로딩/에러 상태
+  // 게시물 작성자의 프로필 이미지를 위한 상태
   const [userProfileImage, setUserProfileImage] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState(null);
 
-
   const imageUrls = useMemo(() => parseImageUrls(post?.image_url), [post?.image_url]);
   const [comments, setComments] = useState([]);
 
-  // 사용자 프로필 이미지 가져오기 로직 (이전 Profile 컴포넌트의 내용)
+  // 게시물 작성자의 프로필 이미지를 불러오는 useEffect
   useEffect(() => {
     if (!post || !post.user_id) {
       setProfileLoading(false);
@@ -55,10 +54,8 @@ export default function PostCard({ post }) {
 
         if (data && data.user_profile_image) {
           setUserProfileImage(data.user_profile_image);
-          console.log(`User ID '${post.user_id}'의 프로필 이미지:`, data.user_profile_image);
         } else {
           setUserProfileImage(null);
-          console.log(`User ID '${post.user_id}'에 대한 프로필 이미지를 찾을 수 없습니다.`);
         }
 
       } catch (err) {
@@ -71,9 +68,9 @@ export default function PostCard({ post }) {
     }
 
     fetchUserProfileImage();
-  }, [post?.user_id]); // post.user_id가 변경될 때마다 다시 실행합니다.
+  }, [post?.user_id]);
 
-  // 댓글 데이터 가져오기 로직 (기존 PostCard의 내용)
+  // 댓글 데이터와 내용 길이 확인을 위한 useEffect
   useEffect(() => {
     if (post?.id) {
       fetchComments();
@@ -85,10 +82,14 @@ export default function PostCard({ post }) {
     }
   }, [post?.id]);
 
+  // 댓글 데이터를 가져오는 함수
   const fetchComments = async () => {
     const { data, error } = await supabase
       .from("comments")
-      .select("*")
+      .select(`
+        *,
+        users(user_profile_image) // users 테이블을 조인하여 댓글 작성자의 프로필 이미지를 가져옴
+      `)
       .eq("diary_id", post.id)
       .order("created_at", { ascending: false });
 
@@ -103,7 +104,7 @@ export default function PostCard({ post }) {
     <div className="card">
       <div className="container">
         <div className="profile_wrap">
-          {/* 프로필 이미지 표시 */}
+          {/* 게시물 작성자 프로필 이미지 표시 로직 */}
           {profileLoading ? (
             <div>프로필 로딩 중...</div>
           ) : profileError ? (
@@ -112,17 +113,18 @@ export default function PostCard({ post }) {
             <Image
               src={userProfileImage}
               alt={`User ${post?.user_id || 'Unknown'}'s profile image`}
-              width={80}
-              height={80}
+              width={50}
+              height={50}
               quality={100}
               priority={true}
+              style={{ borderRadius: '50%', objectFit: 'cover' }}
             />
           ) : (
             <Image
-              src="/normal_profile.webp"
+              src="/normal_profile.webp" // 기본 프로필 이미지
               alt="기본 프로필 이미지"
-              width={80}
-              height={80}
+              width={50}
+              height={50}
               style={{ borderRadius: '50%', objectFit: 'cover' }}
               priority={true}
             />
@@ -147,7 +149,7 @@ export default function PostCard({ post }) {
         <PostComments
           postId={post.id}
           isOpen={isCommentOpen}
-          comments={comments}
+          comments={comments} // `comments` 배열에 각 댓글 작성자의 프로필 이미지 정보가 포함되어 전달됨
           fetchComments={fetchComments}
         />
       </div>

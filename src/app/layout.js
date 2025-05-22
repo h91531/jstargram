@@ -19,6 +19,7 @@ function decodeJWT(token) {
   try {
     const payload = token.split('.')[1];
     const decoded = JSON.parse(Buffer.from(payload, 'base64').toString('utf8'));
+    console.log(decoded);
     return decoded;
   } catch (e) {
     console.error('❌ JWT parsing failed:', e);

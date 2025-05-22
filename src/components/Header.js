@@ -68,6 +68,9 @@ export default function Header({ nickname, id }) {
               <li className="log_out" onClick={handleLogout} style={{ cursor: 'pointer' }}>
                 로그아웃
               </li>
+              <li>
+                <Link href="/mypage" className="mypage">마이페이지</Link>
+              </li>
             </>
           ) : (
             <>

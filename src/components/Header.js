@@ -50,6 +50,7 @@ export default function Header({ nickname, id, profile }) {
       toggleMobileMenu();
     }
   }, [pathname]);
+;
   return (
     <header>
       <div className="container">
@@ -80,7 +81,7 @@ export default function Header({ nickname, id, profile }) {
                 로그아웃
               </li>
               <li>
-                <Link href="/profile" className="profile">프로필</Link>
+                  <Link href={`/profile/${id}`} className="profile">프로필</Link>
               </li>
             </>
           ) : (

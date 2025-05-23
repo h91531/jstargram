@@ -80,7 +80,7 @@ export default function Header({ nickname, id, profile }) {
                 로그아웃
               </li>
               <li>
-                <Link href="/mypage" className="mypage">마이페이지</Link>
+                <Link href="/profile" className="profile">프로필</Link>
               </li>
             </>
           ) : (

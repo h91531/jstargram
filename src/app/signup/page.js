@@ -197,7 +197,6 @@ export default function SignupPage() {
                     <input
                         className="signup-input"
                         type="date"
-                        placeholder="생년월일"
                         value={birth}
                         onChange={(e) => setBirth(e.target.value)}
                         required

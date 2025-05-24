@@ -12,6 +12,7 @@ import parseImageUrls from "../../../utils/parseImageUrls";
 import userStore from '../../../store/userStore';
 import '../../../app/css/post.css';
 import Image from 'next/image';
+import Link from 'next/link'
 
 export default function PostCard({ post }) {
   const { userStore_id } = userStore();
@@ -102,7 +103,7 @@ export default function PostCard({ post }) {
 
   return (
     <div className="card">
-      <div className="container">
+      <div className="inner">
         <div className="profile_wrap">
           {/* 게시물 작성자 프로필 이미지 표시 로직 */}
           {profileLoading ? (
@@ -129,7 +130,7 @@ export default function PostCard({ post }) {
               priority={true}
             />
           )}
-          {post?.nickname && (<h2 className="post_nickname">{post?.nickname}님의 게시물</h2>)}
+          {post?.nickname && (<Link href={`./profile/${post.user_id}`}><h2 className="post_nickname">{post?.nickname}님의 게시물</h2></Link>)}
         </div>
         <PostImageSlider imageUrls={imageUrls} />
         <div className="content_wrap">

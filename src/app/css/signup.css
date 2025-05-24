@@ -15,8 +15,7 @@
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
   padding: 40px 30px;
-  width: 100%;
-  max-width: 420px;
+  width: 93%;
 }
 
 .sign_up .signup-container h1 {
@@ -42,7 +41,7 @@
   padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   background-color: #fafafa;
   transition: border-color 0.3s;
 }
@@ -58,10 +57,11 @@
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s;
+  white-space: nowrap;
 }
 
 .sign_up .signup-container .id_check .login_btn:hover {
@@ -72,9 +72,10 @@
   padding: 12px 14px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   background-color: #fafafa;
   transition: border-color 0.3s;
+  width: 100%;
 }
 
 .sign_up .signup-container .signup-input:focus {
@@ -102,7 +103,7 @@
   margin-top: 10px;
   display: flex;
   flex-direction: column;
-  font-size: 14px;
+  font-size: 16px;
   color: #555;
 }
 
@@ -117,7 +118,7 @@
   border-radius: 10px;
   padding: 10px;
   background-color: #fafafa;
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
 }
 
@@ -151,3 +152,15 @@
 .sign_up .signup-container .remove-btn:hover {
   color: #000;
 }
+
+.sign_up .signup-container .profile-image-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sign_up .signup-container .profile-image-preview {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+

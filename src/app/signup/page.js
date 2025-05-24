@@ -11,8 +11,8 @@ export default function SignupPage() {
     const [birth, setBirth] = useState('');
     const [phone, setPhone] = useState('');
     const [nickname, setNickname] = useState('');
-    const [profileImage, setProfileImage] = useState(null); // 실제 파일 객체
-    // 프로필 이미지 미리보기를 위한 상태, 기본 이미지 URL로 초기화
+    const [profileImage, setProfileImage] = useState(null);
+    const [bio, setBio] = useState("");
     const [profileImagePreview, setProfileImagePreview] = useState('https://res.cloudinary.com/dzlsssxtp/image/upload/v1747885661/user_profile_images/54354354353_profile_1747885660689.webp');
 
     const [isIdChecked, setIsIdChecked] = useState(false);
@@ -62,6 +62,7 @@ export default function SignupPage() {
         formData.append('user_birth', birth);
         formData.append('user_phone', phone);
         formData.append('user_nickname', nickname);
+        formData.append('user_bio', bio);
         if (profileImage) {
             formData.append('profile_image', profileImage); // 프로필 이미지 파일 추가
         }
@@ -84,6 +85,7 @@ export default function SignupPage() {
                 setBirth('');
                 setPhone('');
                 setNickname('');
+                setBio('');
                 setProfileImage(null); // 이미지 상태 초기화
                 // 이미지 미리보기 상태도 기본 이미지로 초기화
                 setProfileImagePreview('https://res.cloudinary.com/dzlsssxtp/image/upload/v1747885661/user_profile_images/54354354353_profile_1747885660689.webp');
@@ -138,6 +140,9 @@ export default function SignupPage() {
             alert('중복 확인 중 오류가 발생했습니다.');
         }
     };
+    const handleBioChange = (e) => {
+        setBio(e.target.value)
+    }
 
     return (
         <div className="sign_up">
@@ -200,7 +205,9 @@ export default function SignupPage() {
                         value={birth}
                         onChange={(e) => setBirth(e.target.value)}
                         required
+                        id="birth"
                     />
+                    <p>위에 빈 칸을 눌러 생년월일을 선택해주세요.</p>
                     <input
                         className="signup-input"
                         type="text"
@@ -222,18 +229,20 @@ export default function SignupPage() {
                             accept="image/*" // 이미지 파일만 선택 가능하도록 설정
                             onChange={handleProfileImageChange}
                         />
-                        {/* 이미지 미리보기 */}
                         <div className="profile-image-preview">
                             <img
                                 src={profileImagePreview}
                                 alt="프로필 이미지 미리보기"
-                                style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
+                                style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }}
                             />
                         </div>
                         {profileImage && (
                             <p className="selected-image-info">선택된 파일: {profileImage.name}</p>
                         )}
                     </div>
+
+                    <textarea className="signup-textarea bio" placeholder="자기소개" value={bio} onChange={handleBioChange}
+                    ></textarea>
 
                     <button className="signup-button" type="submit">
                         가입하기

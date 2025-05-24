@@ -13,6 +13,7 @@ export const POST = async (req) => {
     const user_phone = formData.get('user_phone');
     const user_nickname = formData.get('user_nickname');
     const profileImageFile = formData.get('profile_image');
+    const user_bio = formData.get('user_bio');
 
     let profileImageUrl = null;
 
@@ -46,7 +47,8 @@ export const POST = async (req) => {
           user_birth,
           user_phone,
           user_nickname,
-          user_profile_image: profileImageUrl, // Supabase 컬럼 이름에 맞춤
+          user_profile_image: profileImageUrl,
+          user_bio,
         },
       ]);
 

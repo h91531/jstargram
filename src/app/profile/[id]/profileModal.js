@@ -1,76 +1,270 @@
-'use client'; // 클라이언트 컴포넌트임을 명시
+// src/app/profile/[id]/ProfileModal.jsx
+'use client';
 
-import React, { useState, useEffect } from 'react'; // useEffect 추가
-import { supabase } from '@/lib/supabaseClient'; // supabase 임포트
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+import NicknameInput from './NicknameInput';
+import BioTextarea from './BioTextarea';
+import userStore from '../../../store/userStore';
+import ProfileImgUpdate from './profileImgUpdate'; 
+
+import Cookies from 'js-cookie'; 
+
+// 기본 이미지 URL을 'normal_profile.webp'로 설정
+const DEFAULT_PROFILE_IMAGE_URL = '/normal_profile.webp'; 
 
 export default function ProfileModal({ isOpen, onClose, userId, currentProfileData, onProfileUpdate }) {
-    // 모달이 열려있지 않으면 아무것도 렌더링하지 않습니다.
     if (!isOpen) {
         return null;
     }
 
-    // 자기소개(bio)를 위한 상태를 만듭니다.
-    // currentProfileData에서 user_bio를 초기값으로 설정합니다.
     const [editedBio, setEditedBio] = useState(currentProfileData?.user_bio || '');
-    const [loading, setLoading] = useState(false); // 로딩 상태 추가
-    const [error, setError] = useState(null); // 에러 상태 추가
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    // currentProfileData가 변경될 때 editedBio를 업데이트합니다.
-    // 이는 모달이 다시 열리거나 데이터가 새로고침될 때 유용합니다.
+    const [editNickname, setEditNickname] = useState(currentProfileData?.user_nickname || '');
+    const [isNicknameAvailable, setIsNicknameAvailable] = useState(true); 
+
+    const [selectedImageFile, setSelectedImageFile] = useState(null);
+    const [newProfileImageUrl, setNewProfileImageUrl] = useState(currentProfileData?.user_profile_image || null);
+    const [resetToDefaultImage, setResetToDefaultImage] = useState(false); 
+
+    const { nickname: userStoreNickname, setNickname: setuserStoreNickname } = userStore();
+
     useEffect(() => {
         setEditedBio(currentProfileData?.user_bio || '');
-    }, [currentProfileData]);
+        setEditNickname(currentProfileData?.user_nickname || '');
+        const isCurrentlyDefault = currentProfileData?.user_profile_image === DEFAULT_PROFILE_IMAGE_URL;
+        setNewProfileImageUrl(isCurrentlyDefault ? DEFAULT_PROFILE_IMAGE_URL : currentProfileData?.user_profile_image);
+        setResetToDefaultImage(isCurrentlyDefault); 
+        setSelectedImageFile(null); 
+        setIsNicknameAvailable(true); 
+        setError(null); 
+    }, [currentProfileData, isOpen]);
 
+    const handleNicknameChange = (newNickname) => {
+        setEditNickname(newNickname);
+        if (newNickname !== currentProfileData?.user_nickname) {
+            setIsNicknameAvailable(false); 
+        } else {
+            setIsNicknameAvailable(true); 
+        }
+    };
 
-    // 자기소개 수정 핸들러
-    const handleSaveBio = async () => {
+    const handleNicknameAvailabilityChange = (available) => {
+        setIsNicknameAvailable(available);
+    };
+
+    const handleBioChange = (newBio) => {
+        setEditedBio(newBio);
+    };
+
+    const handleFileSelect = (file) => {
+        setSelectedImageFile(file);
+        setResetToDefaultImage(false); 
+    };
+
+    const handleResetToDefault = (shouldReset = true) => {
+        setResetToDefaultImage(shouldReset);
+        if (shouldReset) {
+            setNewProfileImageUrl(DEFAULT_PROFILE_IMAGE_URL);
+            setSelectedImageFile(null);
+        } else {
+            setNewProfileImageUrl(currentProfileData?.user_profile_image); 
+        }
+    };
+
+    const handleSaveProfile = async () => {
         setLoading(true);
         setError(null);
-        try {
-            // Supabase에 user_bio 업데이트 요청
-            const { data, error } = await supabase
-                .from('users')
-                .update({ user_bio: editedBio })
-                .eq('user_id', userId); // 해당 userId의 프로필을 업데이트
 
-            if (error) {
-                console.error('자기소개 업데이트 오류:', error.message);
-                setError('자기소개 업데이트에 실패했습니다.');
+        if (editNickname !== currentProfileData?.user_nickname && !isNicknameAvailable) {
+            alert('닉네임 중복 확인을 해주세요.');
+            setLoading(false);
+            return;
+        }
+
+        let imageUrlToSave = newProfileImageUrl; 
+
+        if (selectedImageFile) {
+            const formData = new FormData();
+            formData.append('file', selectedImageFile);
+            formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
+
+            try {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error.message || 'Cloudinary 이미지 업로드에 실패했습니다.');
+                }
+
+                const data = await response.json();
+                imageUrlToSave = data.secure_url; 
+                setNewProfileImageUrl(imageUrlToSave); 
+
+            } catch (imageUploadError) {
+                console.error('이미지 업로드 중 오류:', imageUploadError.message);
+                setError('이미지 업로드에 실패했습니다: ' + imageUploadError.message);
+                setLoading(false);
+                return;
+            }
+        } 
+        else if (resetToDefaultImage) {
+            imageUrlToSave = DEFAULT_PROFILE_IMAGE_URL;
+        }
+
+        const isOldImageCloudinary = currentProfileData?.user_profile_image && 
+                                     currentProfileData.user_profile_image !== DEFAULT_PROFILE_IMAGE_URL &&
+                                     currentProfileData.user_profile_image.includes('res.cloudinary.com');
+
+        const isImageChanged = imageUrlToSave !== currentProfileData?.user_profile_image;
+
+        if (isOldImageCloudinary && isImageChanged) {
+            try {
+                const publicIdMatch = currentProfileData.user_profile_image.match(/\/v\d+\/(.+?)\.\w{3,4}$/);
+                let publicId = '';
+                if (publicIdMatch && publicIdMatch[1]) {
+                    publicId = publicIdMatch[1];
+                } else {
+                    const parts = currentProfileData.user_profile_image.split('/');
+                    const uploadIndex = parts.indexOf('upload');
+                    if (uploadIndex > -1 && parts[uploadIndex + 1]) {
+                        publicId = parts.slice(uploadIndex + 1).join('/').split('.')[0];
+                    }
+                }
+
+                if (!publicId) {
+                    console.warn('이전 이미지 삭제: Cloudinary public ID를 추출할 수 없습니다. URL:', currentProfileData.user_profile_image);
+                } else {
+                    console.log("이전 Cloudinary 이미지 삭제 시도. publicId:", publicId);
+                    const deleteResponse = await fetch('/api/deleteImage', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ publicId: publicId }), 
+                    });
+
+                    if (!deleteResponse.ok) {
+                        const errorData = await deleteResponse.json();
+                        console.error('Cloudinary 이미지 삭제 실패:', errorData.error || '알 수 없는 오류');
+                    } else {
+                        console.log('이전 Cloudinary 이미지 삭제 성공');
+                    }
+                }
+            } catch (deleteError) {
+                console.error('이전 Cloudinary 이미지 삭제 중 네트워크 오류:', deleteError);
+            }
+        }
+
+
+        try {
+            const updates = {
+                user_bio: editedBio,
+                user_profile_image: imageUrlToSave, 
+            };
+
+            if (editNickname !== currentProfileData?.user_nickname && isNicknameAvailable) {
+                updates.user_nickname = editNickname;
+            }
+
+            const { data, error: updateError } = await supabase
+                .from('users')
+                .update(updates)
+                .eq('user_id', userId);
+
+            if (updateError) {
+                console.error('프로필 데이터베이스 업데이트 오류:', updateError.message);
+                setError('프로필 업데이트에 실패했습니다.');
             } else {
-                console.log('자기소개 업데이트 성공:', data);
-                // 업데이트 성공 후 상위 컴포넌트의 데이터 다시 불러오기
+
+                const hasNicknameChanged = updates.user_nickname !== undefined;
+                const hasImageChanged = imageUrlToSave !== currentProfileData?.user_profile_image;
+
+                if (hasNicknameChanged || hasImageChanged) {
+                    try {
+                        const response = await fetch('/api/update-token', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                userId: userId,
+                                newNickname: hasNicknameChanged ? updates.user_nickname : currentProfileData?.user_nickname, 
+                                newProfileImageUrl: imageUrlToSave 
+                            }),
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || '토큰 갱신에 실패했습니다.');
+                        }
+
+                        const result = await response.json();
+                        console.log("JWT 토큰 갱신 성공:", result);
+
+                        if (hasNicknameChanged) {
+                            setuserStoreNickname(updates.user_nickname);
+                        }
+                        
+                        window.location.reload(); 
+
+                    } catch (tokenRefreshError) {
+                        console.error('ProfileModal: JWT 토큰 갱신 오류:', tokenRefreshError.message);
+                        setError('토큰 갱신 중 오류가 발생했습니다.');
+                        setLoading(false);
+                        return;
+                    }
+                }
+
                 if (onProfileUpdate) {
                     await onProfileUpdate();
                 }
-                // 모달 닫기
-                onClose();
+
+                onClose(); 
             }
         } catch (err) {
-            console.error('예상치 못한 오류:', err.message);
-            setError('알 수 없는 오류가 발생했습니다.');
+            console.error('ProfileModal: 프로필 저장 중 예상치 못한 오류:', err.message);
+            setError('프로필 저장 중 알 수 없는 오류가 발생했습니다.');
         } finally {
             setLoading(false);
         }
     };
 
+
     return (
-        <div className="profile_modal_overlay"> {/* 모달 오버레이를 위한 클래스 추가 */}
+        <div className="profile_modal_overlay">
             <div className="profile_modal_wrap inner">
-                <h2>자기소개 수정</h2>
-                <textarea
-                    value={editedBio} // 상태 값으로 설정
-                    onChange={(e) => setEditedBio(e.target.value)} // 입력 값 변경 시 상태 업데이트
-                    placeholder="자기소개를 입력해주세요."
-                ></textarea>
+                <h2>프로필 수정</h2>
+                <NicknameInput
+                    userId={userId}
+                    currentNickname={currentProfileData?.user_nickname}
+                    onNicknameChange={handleNicknameChange}
+                    onNicknameAvailabilityChange={handleNicknameAvailabilityChange}
+                />
+
+                <ProfileImgUpdate
+                    currentProfileImageUrl={currentProfileData?.user_profile_image} 
+                    onFileSelect={handleFileSelect} 
+                    onResetToDefault={handleResetToDefault} 
+                />
+
+                <BioTextarea
+                    currentBio={currentProfileData?.user_bio}
+                    onBioChange={handleBioChange}
+                />
+
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 <button
                     type="button"
-                    onClick={handleSaveBio}
-                    disabled={loading} // 로딩 중에는 버튼 비활성화
+                    onClick={handleSaveProfile}
+                    disabled={loading || (editNickname !== currentProfileData?.user_nickname && !isNicknameAvailable)}
                 >
                     {loading ? '수정 중...' : '수정하기'}
                 </button>
-                <button type="button" onClick={onClose}>닫기</button> {/* onClose 함수 호출로 모달 닫기 */}
+                <button type="button" onClick={onClose} disabled={loading}>닫기</button>
             </div>
         </div>
     );

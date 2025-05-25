@@ -42,6 +42,7 @@ main .profile_modal_overlay {
   z-index: 1000;
 }
 
+
 main .profile_modal_wrap {
   background-color: #fff;
   border-radius: 12px;
@@ -103,25 +104,45 @@ main .profile_modal_wrap button:last-of-type:hover {
   background-color: #ccc;
 }
 
-@media (max-width: 768px) {
-  main .profileimg_wrap {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+main .profile_modal_overlay input {
+  width: 100%;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 10px;
+}
 
-  main .profileimg_wrap h2 {
-    margin-top: 10px;
-  }
+main .profile_modal_overlay .profile_modal_nickname_wrap {
+  display: flex;
+  gap: 5px;
+}
 
-  main .profile_modal_wrap {
-    padding: 20px;
-  }
+main .profile_modal_overlay .profile_modal_nickname_wrap button {
+  white-space: nowrap;
+}
 
-  main .profile_modal_wrap textarea {
-    font-size: 14px;
-  }
+main .profile_modal_overlay .profile_image_update_section h3{
+  font-size: 16px;
+  text-align: center;
+  margin: 15px 0;
+}
 
-  main .profile_modal_wrap button {
-    font-size: 14px;
-  }
+main .profile_modal_overlay .profile_image_update_section img {
+  text-align: center;
+  margin: 20px auto;
+}
+
+main .profile_modal_overlay .profile_image_update_section .update_input {
+  margin-bottom: 20px;
+}
+
+main .profile_modal_overlay .profile_image_update_section label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+main .profile_modal_overlay .profile_image_update_section label input {
+ width: 20px;
+ height: 20px;
+
 }

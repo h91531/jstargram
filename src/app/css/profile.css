@@ -43,16 +43,18 @@ main .profile_modal_overlay {
 }
 
 
-main .profile_modal_wrap {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 30px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.profile_modal_wrap {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: 80vh; 
+    overflow-y: auto; 
 }
 
 main .profile_modal_wrap h2 {

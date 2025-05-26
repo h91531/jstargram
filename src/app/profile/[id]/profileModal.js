@@ -7,7 +7,7 @@ import NicknameInput from './NicknameInput';
 import BioTextarea from './BioTextarea';
 import userStore from '../../../store/userStore';
 import ProfileImgUpdate from './profileImgUpdate'; 
-
+import ProfileInfo from './profileinfo';
 import Cookies from 'js-cookie'; 
 
 // 기본 이미지 URL을 'normal_profile.webp'로 설정
@@ -17,6 +17,8 @@ export default function ProfileModal({ isOpen, onClose, userId, currentProfileDa
     if (!isOpen) {
         return null;
     }
+    console.log(currentProfileData.user_phone);
+    console.log(currentProfileData?.user_nickname);
 
     const [editedBio, setEditedBio] = useState(currentProfileData?.user_bio || '');
     const [loading, setLoading] = useState(false);
@@ -244,6 +246,7 @@ export default function ProfileModal({ isOpen, onClose, userId, currentProfileDa
                     onNicknameChange={handleNicknameChange}
                     onNicknameAvailabilityChange={handleNicknameAvailabilityChange}
                 />
+                <ProfileInfo currentProfileData={currentProfileData}/>
 
                 <ProfileImgUpdate
                     currentProfileImageUrl={currentProfileData?.user_profile_image} 

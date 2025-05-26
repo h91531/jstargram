@@ -146,5 +146,10 @@ main .profile_modal_overlay .profile_image_update_section label {
 main .profile_modal_overlay .profile_image_update_section label input {
  width: 20px;
  height: 20px;
+}
 
+main .profile_modal_overlay .info_wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }

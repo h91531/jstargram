@@ -7,18 +7,15 @@ import NicknameInput from './NicknameInput';
 import BioTextarea from './BioTextarea';
 import userStore from '../../../store/userStore';
 import ProfileImgUpdate from './profileImgUpdate'; 
-import ProfileInfo from './profileinfo';
+import ProfileInfo from './profileInfo'; // ProfileInfo 임포트 확인
 import Cookies from 'js-cookie'; 
 
-// 기본 이미지 URL을 'normal_profile.webp'로 설정
 const DEFAULT_PROFILE_IMAGE_URL = '/normal_profile.webp'; 
 
 export default function ProfileModal({ isOpen, onClose, userId, currentProfileData, onProfileUpdate }) {
     if (!isOpen) {
         return null;
     }
-    console.log(currentProfileData.user_phone);
-    console.log(currentProfileData?.user_nickname);
 
     const [editedBio, setEditedBio] = useState(currentProfileData?.user_bio || '');
     const [loading, setLoading] = useState(false);
@@ -31,6 +28,12 @@ export default function ProfileModal({ isOpen, onClose, userId, currentProfileDa
     const [newProfileImageUrl, setNewProfileImageUrl] = useState(currentProfileData?.user_profile_image || null);
     const [resetToDefaultImage, setResetToDefaultImage] = useState(false); 
 
+    // 이름, 전화번호, 생년월일 상태 추가
+    const [editedUserName, setEditedUserName] = useState(currentProfileData?.user_name || '');
+    const [editedUserPhone, setEditedUserPhone] = useState(currentProfileData?.user_phone || '');
+    const [editedUserBirthdate, setEditedUserBirthdate] = useState(currentProfileData?.user_birth || '');
+
+
     const { nickname: userStoreNickname, setNickname: setuserStoreNickname } = userStore();
 
     useEffect(() => {
@@ -42,6 +45,10 @@ export default function ProfileModal({ isOpen, onClose, userId, currentProfileDa
         setSelectedImageFile(null); 
         setIsNicknameAvailable(true); 
         setError(null); 
+        // currentProfileData가 변경될 때 이름, 전화번호, 생년월일 상태도 초기화
+        setEditedUserName(currentProfileData?.user_name || '');
+        setEditedUserPhone(currentProfileData?.user_phone || '');
+        setEditedUserBirthdate(currentProfileData?.user_birth || '');
     }, [currentProfileData, isOpen]);
 
     const handleNicknameChange = (newNickname) => {
@@ -59,6 +66,13 @@ export default function ProfileModal({ isOpen, onClose, userId, currentProfileDa
 
     const handleBioChange = (newBio) => {
         setEditedBio(newBio);
+    };
+
+    // ProfileInfo에서 이름, 전화번호, 생년월일 변경 시 호출될 핸들러
+    const handleProfileInfoChange = ({ userName, userPhone, userDate }) => {
+        setEditedUserName(userName);
+        setEditedUserPhone(userPhone);
+        setEditedUserBirthdate(userDate);
     };
 
     const handleFileSelect = (file) => {
@@ -161,11 +175,14 @@ export default function ProfileModal({ isOpen, onClose, userId, currentProfileDa
             }
         }
 
-
         try {
             const updates = {
                 user_bio: editedBio,
                 user_profile_image: imageUrlToSave, 
+                // ProfileInfo에서 업데이트된 이름, 전화번호, 생년월일 추가
+                user_name: editedUserName,
+                user_phone: editedUserPhone,
+                user_birth: editedUserBirthdate, // Supabase 스키마에 이 필드가 있는지 확인해야 합니다.
             };
 
             if (editNickname !== currentProfileData?.user_nickname && isNicknameAvailable) {
@@ -184,8 +201,13 @@ export default function ProfileModal({ isOpen, onClose, userId, currentProfileDa
 
                 const hasNicknameChanged = updates.user_nickname !== undefined;
                 const hasImageChanged = imageUrlToSave !== currentProfileData?.user_profile_image;
+                // 이름, 전화번호, 생년월일 변경 여부도 확인하여 토큰 갱신 여부를 결정할 수 있습니다.
+                const hasNameChanged = editedUserName !== currentProfileData?.user_name;
+                const hasPhoneChanged = editedUserPhone !== currentProfileData?.user_phone;
+                const hasBirthdateChanged = editedUserBirthdate !== currentProfileData?.user_birth;
 
-                if (hasNicknameChanged || hasImageChanged) {
+
+                if (hasNicknameChanged || hasImageChanged || hasNameChanged || hasPhoneChanged || hasBirthdateChanged) {
                     try {
                         const response = await fetch('/api/update-token', {
                             method: 'POST',
@@ -195,7 +217,10 @@ export default function ProfileModal({ isOpen, onClose, userId, currentProfileDa
                             body: JSON.stringify({
                                 userId: userId,
                                 newNickname: hasNicknameChanged ? updates.user_nickname : currentProfileData?.user_nickname, 
-                                newProfileImageUrl: imageUrlToSave 
+                                newProfileImageUrl: imageUrlToSave,
+                                newUserName: hasNameChanged ? editedUserName : currentProfileData?.user_name,
+                                newUserPhone: hasPhoneChanged ? editedUserPhone : currentProfileData?.user_phone,
+                                newUserBirthdate: hasBirthdateChanged ? editedUserBirthdate : currentProfileData?.user_birth,
                             }),
                         });
 
@@ -246,7 +271,11 @@ export default function ProfileModal({ isOpen, onClose, userId, currentProfileDa
                     onNicknameChange={handleNicknameChange}
                     onNicknameAvailabilityChange={handleNicknameAvailabilityChange}
                 />
-                <ProfileInfo currentProfileData={currentProfileData}/>
+                {/* ProfileInfo에 onInfoChange prop 전달 */}
+                <ProfileInfo
+                    currentProfileData={currentProfileData}
+                    onInfoChange={handleProfileInfoChange}
+                />
 
                 <ProfileImgUpdate
                     currentProfileImageUrl={currentProfileData?.user_profile_image} 

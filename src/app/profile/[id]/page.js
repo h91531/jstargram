@@ -30,7 +30,7 @@ export default function UserProfilePage() {
       // 1. 사용자 프로필 데이터 가져오기
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('user_nickname, user_profile_image, user_bio')
+        .select('*')
         .eq('user_id', userIdFromUrl)
         .maybeSingle();
 

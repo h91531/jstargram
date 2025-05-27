@@ -7,8 +7,22 @@ main .profile_wrap {
 main .profileimg_wrap {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 30px;
   margin-bottom: 20px;
+}
+
+main .profileimg_wrap ul {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: center;
+}
+
+main .profileimg_wrap ul li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
 }
 
 main .profileimg_wrap h2 {
@@ -25,7 +39,6 @@ main .bio {
   padding: 15px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  background-color: #f9f9f9;
 }
 
 /* Profile Modal 스타일 */
@@ -43,7 +56,7 @@ main .profile_modal_overlay {
 }
 
 
-.profile_modal_wrap {
+main .profile_modal_wrap {
     background-color: #fff;
     border-radius: 12px;
     padding: 30px;
@@ -52,17 +65,43 @@ main .profile_modal_overlay {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
     max-height: 80vh; 
     overflow-y: auto; 
 }
 
-main .profile_modal_wrap h2 {
+main .profile_modal_wrap .title_wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+  position: fixed;
+  width: 100%;
+  background: #fff;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  position: relative;
+}
+
+main .profile_modal_wrap .title_wrap img {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+main .profile_modal_wrap .title_wrap h2 {
   font-size: 22px;
   font-weight: 600;
   color: #333;
-  margin-bottom: 10px;
   text-align: center;
+}
+
+main .profile_modal_wrap .title_wrap .title_fix {
+  position: relative;
+  width: 100%;
 }
 
 main .profile_modal_wrap textarea {
@@ -153,3 +192,35 @@ main .profile_modal_overlay .info_wrap {
   flex-direction: column;
   gap: 20px;
 }
+
+main .profile_modal_overlay .info_wrap ul {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+main .profile_modal_overlay .info_wrap ul li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+main .profile_modal_overlay .info_wrap ul li label {
+ white-space: nowrap;
+ min-width: 60px;
+}
+main .profile_modal_overlay .info_wrap ul li input {
+
+}
+
+main .profile_modal_overlay .profile_modal_nickname_wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+main .profile_modal_overlay .profile_modal_nickname_wrap label {
+  white-space: nowrap;
+  min-width: 60px;
+}
+main .profile_modal_overlay .profile_modal_nickname_wrap input {}
+
+main .profile_wrap .modify_btn {padding: 10px; background: #000; color: #fff; border-radius: 10px; font-size: 16px;}

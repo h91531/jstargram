@@ -22,10 +22,20 @@ export default function ProfileImg({ imgurl, user_nickname, postCount }) {
         }}
       />
       <h2>{user_nickname}</h2>
-      <div>
-        <p>게시물</p>
-        <span>{postCount}</span>
-      </div>
+      <ul>
+        <li>
+          <p>게시물</p>
+          <span>{postCount}</span>
+        </li>
+        <li>
+          <p>팔로워</p>
+          <span>0</span>
+        </li>
+        <li>
+          <p>팔로잉</p>
+          <span>0</span>
+        </li>
+      </ul>
 
     </div>
   );

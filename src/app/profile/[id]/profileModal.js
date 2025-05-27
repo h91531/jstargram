@@ -9,6 +9,7 @@ import userStore from '../../../store/userStore';
 import ProfileImgUpdate from './profileImgUpdate'; 
 import ProfileInfo from './profileInfo'; // ProfileInfo 임포트 확인
 import Cookies from 'js-cookie'; 
+import Image from 'next/image';
 
 const DEFAULT_PROFILE_IMAGE_URL = '/normal_profile.webp'; 
 
@@ -264,7 +265,18 @@ export default function ProfileModal({ isOpen, onClose, userId, currentProfileDa
     return (
         <div className="profile_modal_overlay">
             <div className="profile_modal_wrap inner">
-                <h2>프로필 수정</h2>
+                <div className="title_wrap">
+                    <div className="title_fix">
+                        <h2>프로필 수정</h2>
+                        <Image 
+                            src="/close.svg"
+                            width={30}
+                            height={30}
+                            alt="닫기"
+                            onClick={onClose}
+                        />
+                    </div>
+                </div>
                 <NicknameInput
                     userId={userId}
                     currentNickname={currentProfileData?.user_nickname}

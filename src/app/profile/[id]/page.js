@@ -104,11 +104,13 @@ export default function UserProfilePage() {
   // 모달을 여는 함수
   const openProfileModal = () => {
     setIsProfileModalOpen(true);
+    document.body.classList.add('notscroll');
   };
 
   // 모달을 닫는 함수
   const closeProfileModal = () => {
     setIsProfileModalOpen(false);
+    document.body.classList.remove('notscroll');
   };
 
   return (

@@ -93,11 +93,13 @@ export default function NicknameInput({ userId, currentNickname, onNicknameChang
 
     return (
         <div className="profile_modal_nickname_wrap">
+            <label htmlFor='modify_user'>닉네임</label>
             <input
                 type="text"
                 placeholder="닉네임을 입력해주세요."
                 value={nickname}
                 onChange={handleInputChange}
+                id="modify_user"
             />
             <button
                 type="button"

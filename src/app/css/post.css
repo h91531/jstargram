@@ -291,6 +291,14 @@
     border-radius: 100%;
 }
 
+.user_post_wrap.on {
+    display: none;
+}
+
+
+
+
+
 @media (max-width: 630px) {
     .post_wrap .top {
         right: 30px;
